@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "*"
+fastdtw = "*"
+matplotlib = "*"
+scikit-learn = "==1.0.1"
+scipy = "==1.7.2"
+
+[dev-packages]
+pytest = "*"
+
+[requires]
+python_version = "3.8"
