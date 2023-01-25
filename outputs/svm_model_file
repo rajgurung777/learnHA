@@ -1,0 +1,13 @@
+svm_type c_svc
+kernel_type polynomial
+degree 1
+gamma 0.5
+coef0 1
+nr_class 2
+total_sv 2
+rho 0.028259828288074856
+label 1 -1
+nr_sv 1 1
+SV
+0.98084377191478933 1:0.61728491 2:-0.86541505 
+-0.98084377191478933 1:-0.88082291 2:0.48876163 
