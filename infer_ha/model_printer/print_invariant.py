@@ -1,5 +1,13 @@
 
 def print_invariant(f_out, mode_inv, modeID):
+    """
+    :param f_out: file pointer where the output is printed.
+    :param mode_inv: is a list with items of type [mode-id, invariant-constraints]. Where mode-id is the location number
+                  and invariant-constraints holds the bounds (min, max) of each variable in the corresponding mode-id.
+    :param modeID: location ID.
+
+    """
+
     # Printing mode-invariant here with variable's bound value
     f_out.write("inv:\n")
     if len(mode_inv) == 0:  # not empty

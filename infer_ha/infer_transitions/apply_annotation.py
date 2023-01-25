@@ -1,9 +1,17 @@
 
 
 def apply_annotation(Y, variableType_datastruct, list_connection_pt, assignment_coeff, assignment_intercept):
-    # ********* Annotation ******************
-    '''
-    Human annotation to be performed on the assignment based on the type of variables.
+    """
+    Type Annotation function. Type annotation is performed on the assignments based on the variable's type.
+
+    :param Y: contains the y_list values for all the points except the first and last M points (M is the order in BDF).
+    :param variableType_datastruct: specific data structure holding user's information about type annotation values.
+    :param list_connection_pt: is the connection triplet having (pre-end, end, start) point/position for a connection.
+    :param assignment_coeff: contains the values of the coefficients for the assignment equation.
+    :param assignment_intercept: contains the values of the intercepts for the assignment equation.
+    :return: the coefficients and intercept values of the assignment equations.
+
+    Examples:
     For variable having index i, do the following for the variable of
     type 't1' (continuous)
         1) set coefficient with index i, to 1 and 0 to the rest
@@ -15,9 +23,9 @@ def apply_annotation(Y, variableType_datastruct, list_connection_pt, assignment_
         1) set all coefficient with index i, to 0
         2) set the intercept value to pv for index i
 
-    '''
+    """
 
-    print(variableType_datastruct)
+    # print(variableType_datastruct)
 
     # if no annotation information is provided then below for-loop will not run
     for var_type_detail in variableType_datastruct:  # accessing each variable details

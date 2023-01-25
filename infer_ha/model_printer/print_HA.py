@@ -11,6 +11,29 @@ from infer_ha.model_printer.print_transition import *
 
 
 def print_HA(P, G, mode_inv, transitions, learning_parameters, outputfilename):
+    """
+
+    :param P: is a list. Each item of the list P contain list of values which are positions of points of a trajectories.
+           The size of the list P is equal to the number of clusters or modes of the learned hybrid automaton (HA).
+    :param G: is a list. Each item of the list G is a list that holds the coefficients (obtained using linear regression)
+           of the ODE of a mode of the learned HA.
+    :param mode_inv: is a list with items of type [mode-id, invariant-constraints]. Where mode-id is the location number
+                  and invariant-constraints holds the bounds (min, max) of each variable in the corresponding mode-id.
+    :param transitions: is a list with structure [src_mode, dest_mode, guard_coeff, assignment_coeff, assignment_intercept]
+                     where
+            src_mode: is the source location number
+            dest_mode: is the destination location number
+            guard_coeff: is a list containing the coefficient of the guard equation (polynomial)
+            assignment_coeff: is a list containing the coefficient of the assignment equations (from linear regression)
+            assignment_intercept: is a list containing the intercepts of the assignment equations (linear regression)
+    :param learning_parameters: is a dictionary data structure containing all the parameters required for our learning
+            algorithm. The arguments of the learning_parameters can also be passed as a command-line arguments. The
+            command-line usages can be obtained using the --help command. To find the details of the arguments see the
+            file/module "utils/commandline_parser.py"
+    :param outputfilename: name of the file where the HA model is printed as an output.
+    :return:
+
+    """
 
     maxorder = learning_parameters['ode_degree']
     boundary_order = learning_parameters['guard_degree']

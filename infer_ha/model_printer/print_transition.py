@@ -4,6 +4,14 @@ from infer_ha.model_printer.print_assignment import *
 from utils import misc_math_functions as myUtil
 
 def print_transition(f_out, transitions, system_dim, boundary_order):
+    """
+        :param f_out: file pointer where the output is printed.
+        :param transitions: is a list. Each item of the list P contain list of values which are positions of points of a trajectories.
+               The size of the list P is equal to the number of clusters or modes of the learned hybrid automaton (HA).
+        :param system_dim: system dimension.
+        :param boundary_order: degree of the polynomial concerning the guard's equation.
+
+        """
 
     # I have to loop through transitions to access all the transitions
     # **** Computing the polynomial expression for guard ****

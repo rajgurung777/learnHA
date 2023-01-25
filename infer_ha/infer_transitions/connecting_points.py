@@ -1,34 +1,28 @@
-'''
+"""
 Connecting points for inferring transitions
-
-'''
+"""
 
 def create_connecting_points(P, position, segmentedTrajectories):
-    '''
-    Determine connecting points from the segmented trajectories with respect to clusters
-    :return:
-    '''
-    '''
-    # ***************************************** Start of the code *************************************************
-    # Amit: Now implementing the idea to search start and end position/point of segments that are on either modes.
-    #   we plan to use this points to determine assignment and guard between the modes
-    #   We use oneVsOne approach, where every Mode can have a transition to every other Mode (both in forward and backward direction)
-    Todo: When n=number_of_modes > 1 but for single mode system this will not work
-    for i = 1 to n      //forward transition for each cluster-i to every other cluster-j
-        for j= (i+1) to n
-        // ******** code below is for forward-transition 
-            for t = 1 to len(trajectories)  //loop all trajectories
-                for g=1 to len(segments) - 1    //last start-pt is compared with the previous end-pt
-                    if end_g \in C_i        //pt end_g present in C_i
-                        if start_{g+1} \in C_j       //and pt start_{g+1} present in C_j
-                            append(end_g , start_{g+1}) in transition(i,j)
-        // ******** code below is for the back-transition 
-            for t = 1 to len(trajectories)  //loop all trajectories
-                for g=1 to len(segments) - 1    //last start-pt is compared with the previous end-pt
-                    if end_g \in C_j        //pt end_g present in C_j
-                        if start_{g+1} \in C_i       //and pt start_{g+1} present in C_j
-                            append(end_g , start_{g+1}) in transition(j,i)             
-    '''
+    """
+    Determine connecting points from the segmented trajectories concerning clusters. Our idea is to establish
+    connections by determining segments' start and end positions/points on either mode (src and dest modes). We plan to
+    use these points to determine assignments and guards between the modes. 'datapoints' is a list of points that
+    connect a source and destination location. We consider the 'datapoints' as a triplet of type
+    [pre_end_posi, end_posi, start_posi], where pre_end_posi and end_posi positions are on the source location, and
+    start_posi is the position of the starting point of a segment in the destination location.
+
+    :param P: is a list containing the list of positions of each cluster or mode.
+    :param position: is a list of position data structure. Each position is a pair (start, end) position of a trajectory.
+        For instance, the first item of the list is [0, 100] means that the trajectory has 101 points. The second item
+        as [101, 300], meaning the second trajectory has 200 points. Note that all the trajectories are concatenated.
+    :param segmentedTrajectories: is a data structure containing the positions of the segmented trajectories that keeps
+        track of the connections between them.
+    :return: 'datapoints' is a list of data points that holds a connection between a source and destination location.
+        The 'datapoints' is a triplet of type [pre_end_posi, end_posi, start_posi], where pre_end_posi and end_posi
+        positions are on the source location, and start_posi is the position of the starting point of a segment in the
+        destination location.
+
+    """
 
     cluster_len = len(P)
     traj_size = len(position)
@@ -80,7 +74,6 @@ def create_connecting_points(P, position, segmentedTrajectories):
                     data_points.append([j, i, data_points_per_trans])
                     print("[src, dest, total-points] = [", j, " , ", i, " , ", len(data_points_per_trans), "]")
     # print("\nLength of data points = ", len(data_points))
-    # print("data points are ", data_points)  # forward and backward transition points are all here
-    # **************************************** End of the code *****************************************************
+    # print("data points are ", data_points)
     return data_points
 

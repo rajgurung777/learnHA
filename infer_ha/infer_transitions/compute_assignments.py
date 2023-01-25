@@ -1,8 +1,16 @@
-
 from sklearn import linear_model
 
 
 def compute_assignments(list_connection_pt, L_y, Y):
+    """
+    Type Annotation function. Type annotation is performed on the assignments based on the variable's type.
+
+    :param list_connection_pt: is the connection triplet having (pre-end, end, start) point/position for a connection.
+    :param L_y: is the dimension (input + output variables) of the system whose trajectory is being parsed.
+    :param Y: contains the y_list values for all the points except the first and last M points (M is the order in BDF).
+    :return: the coefficients and intercept values of the assignment equations.
+
+    """
     x_pts = []
     y_pts = []
     for connection_pt in list_connection_pt:

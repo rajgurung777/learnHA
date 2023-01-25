@@ -1,5 +1,13 @@
 
 def print_guard(f_out, coeffs, gExp):
+    """
+
+    :param f_out: file pointer where the output is printed.
+    :param coeffs: the coefficients obtained from SVM for the guard equation.
+    :param gExp: is the polynomial expression obtained from the function myUtil.multinomial().
+
+
+    """
     # The guard/boundary is obtained using SVM (Polynomial Kernel) which is of the form
     # y(w,x)=w * x + b and both the coefficient vector w and x obeys the \Phi mapping function in the paper.
     #

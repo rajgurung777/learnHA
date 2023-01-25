@@ -1,5 +1,12 @@
 
 def print_assignment(f_out, assign_coeffs, intercepts):
+    """
+
+    :param f_out: file pointer where the output is printed.
+    :param assign_coeffs: the coefficients obtained from SVM for the guard equation.
+    :param intercepts: is the polynomial expression obtained from the function myUtil.multinomial().
+
+    """
     # **** Printing Jump-Reset equations ***** Todo: poly of degree n
     trans_assign = "reset:\n"
     for dim in range(0,

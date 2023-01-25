@@ -1,13 +1,38 @@
+"""
+This module is used for computing transitions of an HA.
 
+"""
 from infer_ha.infer_transitions.apply_annotation import apply_annotation
 from infer_ha.infer_transitions.connecting_points import create_connecting_points
 from infer_ha.infer_transitions.compute_assignments import compute_assignments
 from infer_ha.infer_transitions.guards import getGuard_inequality
 
 
-def compute_transitions(P, position, segmentedTrajectories, L_y, boundary_order, Y,
-                        variableType_datastruct, number_of_segments_before_cluster, number_of_segments_after_cluster):
+def compute_transitions(P, position, segmentedTrajectories, L_y, boundary_order, Y, variableType_datastruct,
+                        number_of_segments_before_cluster, number_of_segments_after_cluster):
+    """
+    This function decides to compute or ignore mode-invariant computation based on the user's choice.
 
+
+    :param P: is a list containing the list of positions of each cluster or mode.
+    :param position: is a list of position data structure. Each position is a pair (start, end) position of a trajectory.
+        For instance, the first item of the list is [0, 100] means that the trajectory has 101 points. The second item
+        as [101, 300], meaning the second trajectory has 200 points. Note that all the trajectories are concatenated.
+    :param segmentedTrajectories: is a data structure containing the positions of the segmented trajectories that keeps
+        track of the connections between them.
+    :param L_y: is the dimension (input + output variables) of the system whose trajectory is being parsed.
+    :param boundary_order: degree of the polynomial concerning the guard's equation.
+    :param Y: contains the y_list values for all the points except the first and last M points (M is the order in BDF).
+    :param variableType_datastruct: specific data structure holding user's information about type annotation values.
+    :param number_of_segments_before_cluster: total number of segments obtained using the segmentation process and
+        before applying the clustering algorithm.
+    :param number_of_segments_after_cluster: total number of segments obtained after applying the clustering algorithm.
+    :return: A list of transitions of type [src_mode, dest_mode, guard_coeff, assignment_coeff, assignment_intercept].
+        Where src_mode, and dest_mode store the source and destination location ID. The guard_coeff structure holds the
+        coefficients of the guard polynomial. Whereas assignment_coeff and assignment_intercept contain the
+        coefficients and intercepts value for the assignment equations.
+
+    """
     # print("Computing Connecting points for Transitions ...")
     data_points = create_connecting_points(P, position, segmentedTrajectories)
     print("Computing Connecting points done!")
@@ -28,13 +53,7 @@ def compute_transitions(P, position, segmentedTrajectories, L_y, boundary_order,
         if tot_input_trajectories == number_of_segments_before_cluster:
             return transitions  # transitions here is empty for a single mode system without transition.
 
-    '''
-    Transition structure: [src, dest, coeffs, guard]
-    src and dest are the source and destination ID i.e., the location number
-    coeffs: X-coefficients for each mapping of X'. List of coefficients for each X' variable.
-    assign_intercept: List of intercepts for each X' variable.
-    guard: X-coefficients of the hyperplane equation
-    '''
+
     # transitions = []
     # data_points contains list of connecting points for each Transition
     # Note we are considering possible transition only based on the given trajectory-data.

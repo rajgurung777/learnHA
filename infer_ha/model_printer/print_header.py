@@ -1,6 +1,21 @@
 
 
 def print_header(f_out, num_mode, system_dim, transitions):
+    """
+
+    :param f_out: file pointer where the output is printed.
+    :param num_mode: number of modes.
+    :param system_dim: system dimension.
+    :param transitions: is a list with structure [src_mode, dest_mode, guard_coeff, assignment_coeff, assignment_intercept]
+            where
+            src_mode: is the source location number
+            dest_mode: is the destination location number
+            guard_coeff: is a list containing the coefficient of the guard equation (polynomial)
+            assignment_coeff: is a list containing the coefficient of the assignment equations (from linear regression)
+            assignment_intercept: is a list containing the intercepts of the assignment equations (linear regression)
+    :return:
+
+    """
     # print("Prints header")
     # First line of the file for File-parameter-information. Syntax as below:
     # n_modes   n_dim   n_transitions
