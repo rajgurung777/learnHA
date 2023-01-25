@@ -1,2 +1,3 @@
-# https://www.pythontutorial.net/python-unit-testing/python-run-unittest/
+# script file to execute all the Test Cases
+# For help on unittest see:  https://www.pythontutorial.net/python-unit-testing/python-run-unittest/
 python -m unittest discover -v
