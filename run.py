@@ -13,7 +13,6 @@ methods = ['dbscan', 'piecelinear', 'dtw']
 
 def runLearnHA():  # Calling the implementation from project BBC4CPS
     # input_filename, output_filename, list_of_trajectories, learning_parameters = read_command_line(sys.argv)
-
     parameters = read_commandline_arguments()   # reads the command line values also can use -h to see help on usages
     # Todo: (1) remove position from the parameters and do it in the main infer_HA process
 
@@ -49,5 +48,7 @@ def runLearnHA():  # Calling the implementation from project BBC4CPS
 
     return
 
-runLearnHA()
+# runLearnHA()
 
+if __name__ == '__main__':
+    runLearnHA()

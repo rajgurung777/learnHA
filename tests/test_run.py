@@ -21,7 +21,7 @@ class TestLearnHA(unittest.TestCase):
         parameters = {}
         print("Running test runLearnHA module")
 
-        parameters['input_filename'] = "data/simu_oscillator_2.txt"
+        parameters['input_filename'] = "data/test_data/simu_oscillator_2.txt"
         parameters['output_filename'] = "oscillator_2_withoutAnnotate_test.txt"
 
         parameters['clustering_method'] = 1
@@ -76,7 +76,7 @@ class TestLearnHA(unittest.TestCase):
         parameters = {}
         print("Running test runLearnHA module with Oscillator model with type annotation")
 
-        parameters['input_filename'] = "data/simu_oscillator_2.txt"
+        parameters['input_filename'] = "data/test_data/simu_oscillator_2.txt"
         parameters['output_filename'] = "oscillator_2_withAnnotate_test.txt"
 
         parameters['clustering_method'] = 1
