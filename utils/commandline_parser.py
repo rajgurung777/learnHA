@@ -25,7 +25,7 @@ def read_commandline_arguments():
                         type=int, default=1, required=False)
     parser.add_argument('-b', '--guard-degree', help='Degree of polynomial inequalities for Guards', type=int,
                         default=1, required=False)
-    parser.add_argument('--segmentation-error-tol', help='Maximal error tolerated during segmentation', type=float,
+    parser.add_argument('--segmentation-error-tol', help='Maximal relative-difference (FwdBwd) error tolerated during segmentation', type=float,
                         default=0.01, required=False)
     parser.add_argument('--threshold-distance', help='Maximal threshold for distance in DTW clustering algorithm',
                         type=float, default=0.1, required=False)
@@ -73,8 +73,8 @@ def read_commandline_arguments():
     
     '''
 
-    print("variable-types =", args['variable_types'])
-    print("pool_values =", args['pool_values'])
+    # print("variable-types =", args['variable_types'])
+    # print("pool_values =", args['pool_values'])
 
     if args['clustering_method'] == 1:
         args['methods'] = "dtw"

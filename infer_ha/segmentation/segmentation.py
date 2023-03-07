@@ -163,12 +163,14 @@ def segmented_trajectories(clfs, res, position):
     Note: We delete the last segmented portion of all the trajectories, assuming they are short segments and does not
     help learning. In fact in some cases, they can create problem during clustering (comparing segments for similarity).
 
+    Note: Should not delete the segment if a trajectories has only one segment per trajectory.
+
 
     :param
         clfs: is a list. Each item of the list clfs is a list that holds the coefficients (obtained using linear
         regression) of the ODE of each segment of the segmented trajectories.
     :param
-        res: is a list of the segmented trajectory (positions). Each item of the list res contains a list of values
+        res: is a list of the segmented trajectory (having positions). Each item of the list res contains a list of values
         which are positions of points of trajectories. The size of the list res is the total number of segments
         obtained.
     :param
@@ -181,6 +183,16 @@ def segmented_trajectories(clfs, res, position):
         clfs: the modified clfs, after deleting the last segment per trajectory.
 
     """
+
+    # print("len(position) =", len(position))
+    # print("len(res) =", len(res))
+
+    total_trajectories = len(position) # gives the total number of trajectories supplied as input
+    total_segments = len(res)  # total segments after segmentation process
+    found_single_segment_per_trajecotry = 0 # not found so deletion is required.
+    if total_segments == total_trajectories:    # meaning each trajectory has a single segment (continuous single mode system)
+        # a simple example is "circle" model or a five-dimensional system in XSpeed or SpaceEx
+        found_single_segment_per_trajecotry = 1    # found single-segment-per-trajectory, so do not delete segment
 
     # **************************** Start of segmentation **************************************************
     # We create a list of segments positions of the form [start, end] for each trajectory to .
@@ -208,7 +220,8 @@ def segmented_trajectories(clfs, res, position):
         else:  # meaning if any of the above condition fails. I am assuming all segments will be segmented trajectory-wise
             # that is, no segments will overlap.
             del_res_indices.append(del_index - 1)   # stores the previous index for deletion
-            segments_per_traj = segments_per_traj[ : -1]    # deletes the last segment before creating segmented-trajectories
+            if found_single_segment_per_trajecotry == 0:    # delete when single_segment_per_trajectory not Found
+                segments_per_traj = segments_per_traj[ : -1]    # deletes the last segment before creating segmented-trajectories
             segmentedTrajectories.append(segments_per_traj)
 
             segments_per_traj = []
@@ -221,7 +234,8 @@ def segmented_trajectories(clfs, res, position):
         del_index += 1
 
     del_res_indices.append(del_index - 1)  # stores the previous index for deletion
-    segments_per_traj = segments_per_traj[ : -1]    # deletes the last segment before creating segmented-trajectories
+    if found_single_segment_per_trajecotry == 0:  # delete when single_segment_per_trajectory not Found
+        segments_per_traj = segments_per_traj[ : -1]   # deletes the last segment before creating segmented-trajectories
     segmentedTrajectories.append(segments_per_traj)  # the last segmented trajectory
     # ************************************ End of segmentation ******************************************
     # print("segmentedTrajectories is ", segmentedTrajectories)
@@ -229,10 +243,11 @@ def segmented_trajectories(clfs, res, position):
 
     cluster_by_DTW = True   # Todo for running DTW Clustering algorithm for paper
 
-    for pos in reversed(del_res_indices):
-        res.pop(pos)
-        if cluster_by_DTW == False: # for DTW clustering we do not have clfs data
-            clfs.pop(pos)
+    if found_single_segment_per_trajecotry == 0: # not found so deletion is required
+        for pos in reversed(del_res_indices):
+            res.pop(pos)
+            if cluster_by_DTW == False: # for DTW clustering we do not have clfs data. So skipping this line saves time
+                clfs.pop(pos)
 
     return segmentedTrajectories, res, clfs
 

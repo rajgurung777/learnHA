@@ -63,7 +63,7 @@ def infer_model(list_of_trajectories, learning_parameters):
     transitions = []
 
     t_list, y_list, position = preprocess_trajectories(list_of_trajectories)
-
+    # print("position = ", position)
     # Apply Linear Multistep Method
     A, b1, b2, Y, ytuple = diff_method_backandfor(y_list, maxorder, stepsize)   # compute forward and backward version of BDF
     num_pt = Y.shape[0]
@@ -107,6 +107,7 @@ def infer_model(list_of_trajectories, learning_parameters):
     res, drop, clfs, res_modified = two_fold_segmentation(A, b1, b2, ytuple, size_of_input_variables, ep)
     print("Number of segments, len(res)=", len(res))
     res = res_modified  #TODO: We can comment this if this fix is not required. Now guard is closer to the boundary
+
     segmentedTrajectories, res, clfs = segmented_trajectories(clfs, res, position) # deleted the last segment in each trajectory
     print("Segmentation done!")
 

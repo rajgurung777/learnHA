@@ -24,7 +24,7 @@ def svm_model_training(x, y, boundary_order, c_value_optimal, coef_optimal, gamm
     # param = svm_parameter('-t 1 -d %d -c %d -r 1 -b 0 -q' % (boundary_order, c_value))  # -t 1 for Poly and 2 for RBF
     param = svm_parameter(
         '-t 1 -d %d -c %g -r %g -g %g -b 0 -q' % (boundary_order, c_value, coef_optimal, gamma_value_optimal))  #
-    print("prob =", prob)
+    # print("prob =", prob)
     # param = svm_parameter('-t 1 -d %d -c %d -r 0 -b 0 -q' % (boundary_order, c_value))  # Try coef0 or r to be 0
     # param = svm_parameter('-t 1 -d %d -c 100 -r 1 -b 0 -q' % boundary_order)  # -t 1 for Poly and 2 for RBF
     # print ("SVM param is ", param)
@@ -32,8 +32,7 @@ def svm_model_training(x, y, boundary_order, c_value_optimal, coef_optimal, gamm
     m = svm_train(prob, param)  # This is the time taking operation. recursion limit exceeded here for large data size
 
     sv = m.get_SV()
-    if (
-            len(sv) == 0):  # if error in svm-train with c_value=100 or even with 1. Re-run it with c_value=1 for the second time
+    if (len(sv) == 0):  # if error in svm-train with c_value=100 or even with 1. Re-run it with c_value=1 for the second time
         print("SV is empty")
         c_value = 1
         # param = svm_parameter('-t 1 -d %d -c %d -r %d -b 0 -q' % (boundary_order, c_value, coef_optimal))  # -t 1 for Poly and 2 for RBF

@@ -21,7 +21,7 @@ def runLearnHA():  # Calling the implementation from project BBC4CPS
     output_filename = parameters['output_filename']
 
     list_of_trajectories, stepsize, system_dimension = parse_trajectories(input_filename)
-    print("list of trajectories is ",list_of_trajectories)
+    # print("list of trajectories is ",list_of_trajectories)
     variableType_datastruct = []  # structure that holds [var_index, var_name, var_type, pool_values]
     if len(parameters['variable_types']) >= 1:  # if user supply annotation arguments
         variableType_datastruct = process_type_annotation_parameters(parameters, system_dimension)
