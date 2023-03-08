@@ -47,6 +47,8 @@ def infer_model(list_of_trajectories, learning_parameters):
             guard_coeff: is a list containing the coefficient of the guard equation (polynomial)
             assignment_coeff: is a list containing the coefficient of the assignment equations (from linear regression)
             assignment_intercept: is a list containing the intercepts of the assignment equations (linear regression)
+        position: is a list containing positions of the input list_of_trajectories. This structure is required for printing
+            the HA model. Particularly, to get the starting positions of input trajectories for identifying initial mode(s).
 
     """
 
@@ -108,7 +110,14 @@ def infer_model(list_of_trajectories, learning_parameters):
     print("Number of segments, len(res)=", len(res))
     res = res_modified  #TODO: We can comment this if this fix is not required. Now guard is closer to the boundary
 
-    segmentedTrajectories, res, clfs = segmented_trajectories(clfs, res, position) # deleted the last segment in each trajectory
+    # print("drop = ", drop)
+    # print("res_modified = ", res_modified)
+
+    # ToDo: Instead of deleting the last segment for all models. It is better to ask user's options for deleting
+    # filter_last_segment = 0   # 1 for delete last segment and 0 NOT to delete
+    filter_last_segment = learning_parameters['filter_last_segment']
+    # print("filter_last_segment", filter_last_segment)
+    segmentedTrajectories, res, clfs = segmented_trajectories(clfs, res, position, filter_last_segment) # deleted the last segment in each trajectory
     print("Segmentation done!")
 
     L_y = len(y_list[0][0])  # Number of dimensions
@@ -116,7 +125,7 @@ def infer_model(list_of_trajectories, learning_parameters):
     # ********* Plotting/Visualizing various points for debugging *************************
     # plotdebug.plot_guard_points(segmentedTrajectories, L_y, t_list, Y) # pre-end and end points of each segment
     # plotdebug.plot_reset_points(segmentedTrajectories_modified, L_y, t_list, Y) # plotting Reset or Start points
-    # plotdebug.plot_segmentation(res, L_y, t_list, Y) # Trying to verify the segmentation for each segmented points
+    plotdebug.plot_segmentation(res, L_y, t_list, Y) # Trying to verify the segmentation for each segmented points
 
     number_of_segments_before_cluster = len(res)
     P, G = select_clustering(res, A, b1, clfs, Y, t_list, L_y, learning_parameters) # when len(res) < 2 compute P and G for the single mode
@@ -146,6 +155,6 @@ def infer_model(list_of_trajectories, learning_parameters):
                                       variableType_datastruct, number_of_segments_before_cluster,
                                       number_of_segments_after_cluster)
 
-    return P, G, mode_inv, transitions
+    return P, G, mode_inv, transitions, position
 
 

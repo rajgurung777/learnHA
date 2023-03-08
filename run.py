@@ -34,7 +34,7 @@ def runLearnHA():  # Calling the implementation from project BBC4CPS
     start = time.time()
     #################################################################################################
     # P, G, mode_inv, transitions = learnHA.infer_model(list_of_trajectories, learning_parameters)
-    P, G, mode_inv, transitions = learnHA.infer_model(list_of_trajectories, parameters)
+    P, G, mode_inv, transitions, position = learnHA.infer_model(list_of_trajectories, parameters)
     # Note P is the Segmented data. G is the coefficients of the ODE and boundary is the guard conditions
     #################################################################################################
     end = time.time()
@@ -44,7 +44,7 @@ def runLearnHA():  # Calling the implementation from project BBC4CPS
     print("Number of modes chosen =", num_mode)
     print("Number of modes learned = ", len(P))
 
-    print_HA(P, G, mode_inv, transitions, parameters, output_filename)   # prints an HA model file inside the folder outputs/
+    print_HA(P, G, mode_inv, transitions, position, parameters, output_filename)   # prints an HA model file inside the folder outputs/
 
     return
 

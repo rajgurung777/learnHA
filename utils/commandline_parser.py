@@ -16,24 +16,24 @@ def read_commandline_arguments():
 
     parser = argparse.ArgumentParser(description='Learns HA model from input--output trajectories')
     parser.add_argument('-i', '--input-filename', help='input FileName containing trajectories', type=str, required=True)
-    parser.add_argument('-o', '--output-filename', help='output FileName with the learned HA model', default='out.txt',
+    parser.add_argument('-o', '--output-filename', help='output FileName with the learned HA model. Set to out.txt by default', default='out.txt',
                         required=False)
-    parser.add_argument('-c', '--clustering-method', help='Clustering Algorithm. Options are: 1: DTW  2: DBSCAN  3: piecelinear', type=int,
+    parser.add_argument('-c', '--clustering-method', help='Clustering Algorithm. Options are: 1: DTW (default)  2: DBSCAN  3: piecelinear', type=int,
                         choices=[1, 2, 3], default=1, required=False)
-    parser.add_argument('-d', '--ode-degree', help='Degree of polynomial in ODE', type=int, default=1, required=False)
-    parser.add_argument('-m', '--modes', help='Number of modes. Used only in piecelinear clustering algorithm',
+    parser.add_argument('-d', '--ode-degree', help='Degree of polynomial in ODE. Set to 1 by default', type=int, default=1, required=False)
+    parser.add_argument('-m', '--modes', help='Number of modes. Used only in piecelinear clustering algorithm. Set to 1 by default',
                         type=int, default=1, required=False)
-    parser.add_argument('-b', '--guard-degree', help='Degree of polynomial inequalities for Guards', type=int,
+    parser.add_argument('-b', '--guard-degree', help='Degree of polynomial inequalities for Guards. Set to 1 by default', type=int,
                         default=1, required=False)
-    parser.add_argument('--segmentation-error-tol', help='Maximal relative-difference (FwdBwd) error tolerated during segmentation', type=float,
+    parser.add_argument('--segmentation-error-tol', help='Maximal relative-difference (FwdBwd) error tolerated during segmentation. Set to 0.01 by default', type=float,
                         default=0.01, required=False)
-    parser.add_argument('--threshold-distance', help='Maximal threshold for distance in DTW clustering algorithm',
+    parser.add_argument('--threshold-distance', help='Maximal threshold for distance in DTW clustering algorithm. Set to 0.1 by default',
                         type=float, default=0.1, required=False)
-    parser.add_argument('--threshold-correlation', help='Maximal threshold for correlation value in DTW clustering algorithm',
+    parser.add_argument('--threshold-correlation', help='Maximal threshold for correlation value in DTW clustering algorithm. Set to 0.8 by default',
                         type=float, default=0.8, required=False)
-    parser.add_argument('--dbscan-eps-dist', help='Maximal threshold for distance in DBSCAN clustering algorithm',
+    parser.add_argument('--dbscan-eps-dist', help='Maximal threshold for distance in DBSCAN clustering algorithm. Set to 0.01 by default',
                         type=float, default=0.01, required=False)
-    parser.add_argument('--dbscan-min-samples', help='Maximal threshold for min-samples in DBSCAN clustering algorithm',
+    parser.add_argument('--dbscan-min-samples', help='Maximal threshold for min-samples in DBSCAN clustering algorithm. Set to 2 by default',
                         type=int, default=2, required=False)
     parser.add_argument('--size-input-variable', help='Number of input variables in the trajectories', type=int, required=True)
     parser.add_argument('--size-output-variable', help='Number of output variables in the trajectories', type=int, required=True)
@@ -42,12 +42,16 @@ def read_commandline_arguments():
                         type=str, default='', required=False)
     parser.add_argument('--pool-values', help='set the values of type=t2. Syntax: --pool-values "x1={10, 20, 30, 40}"',
                         type=str, default='', required=False)
-    parser.add_argument('--ode-speedup', help='Maximum number of segments to include for ODE computation',
+    parser.add_argument('--ode-speedup', help='Maximum number of segments to include for ODE computation. Set to 10 by default',
                         type=int, default=10, required=False)
-    parser.add_argument('--is-invariant', help='Options are: 0/1/2. Values 0 and 1 ignores invariant and 2 enables computation',
+    parser.add_argument('--is-invariant', help='Options are: 0/1/2. Values 0 (default) and 1 ignores invariant and 2 enables computation',
                         type=int, choices=[0, 1, 2], default=0, required=False)
-    parser.add_argument('--stepsize', help='Fixed sampling time step-size of the input trajectories',
+    parser.add_argument('--stepsize', help='Fixed sampling time step-size of the input trajectories. Set to 0.01 by default',
                         type=float, default=0.01, required=False)
+    parser.add_argument('--filter-last-segment',
+                        help='1 to enable and 0 to disable (default) filtering out the last segment from a trajectory during segmentation', type=int,
+                        choices=[0,1], default=0, required=False)
+
 
     args = vars(parser.parse_args())    #  create a dict structure of the arguments
     # note the key name replaces with '_' for all '-' in the arguments

@@ -10,7 +10,7 @@ from infer_ha.model_printer.print_location import *
 from infer_ha.model_printer.print_transition import *
 
 
-def print_HA(P, G, mode_inv, transitions, learning_parameters, outputfilename):
+def print_HA(P, G, mode_inv, transitions, position, learning_parameters, outputfilename):
     """
 
     :param P: is a list. Each item of the list P contain list of values which are positions of points of a trajectories.
@@ -26,6 +26,8 @@ def print_HA(P, G, mode_inv, transitions, learning_parameters, outputfilename):
             guard_coeff: is a list containing the coefficient of the guard equation (polynomial)
             assignment_coeff: is a list containing the coefficient of the assignment equations (from linear regression)
             assignment_intercept: is a list containing the intercepts of the assignment equations (linear regression)
+    :param position: is a list containing positions of the input list_of_trajectories. This structure is required for printing
+            the HA model. Particularly, to get the starting positions of input trajectories for identifying initial mode(s).
     :param learning_parameters: is a dictionary data structure containing all the parameters required for our learning
             algorithm. The arguments of the learning_parameters can also be passed as a command-line arguments. The
             command-line usages can be obtained using the --help command. To find the details of the arguments see the
@@ -90,7 +92,7 @@ def print_HA(P, G, mode_inv, transitions, learning_parameters, outputfilename):
 
     f_out = open(outputfilename, "a")  # Opening file-id for writing output
     print_header(f_out, num_mode, system_dim, transitions)
-    print_location(f_out, P, G, mode_inv, Exp)
+    print_location(f_out, P, G, mode_inv, Exp, position)
     print_transition(f_out, transitions, system_dim, boundary_order)
     f_out.close()
 

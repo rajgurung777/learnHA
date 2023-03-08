@@ -109,8 +109,8 @@ def convert_trajectories_to_single_list(list_of_trajectories):
     print("y_list is ", y_list)
     print("shape of y_list=", y_list[0].shape)
     print("type of y_list=", type(y_list[0]))
-    print("position = ", position)
     '''
 
+    print("position = ", position)
 
     return t_list, y_list, position

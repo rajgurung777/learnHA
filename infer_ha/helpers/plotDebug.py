@@ -146,19 +146,19 @@ def plot_segmentation(res, L_y, t_list, Y):
             x_pts.append({dim + 1: Y[id0, dim] for dim in range(L_y)})
             time_pt.append(t_list[0][id0 + 5])  # since Y values are after leaving 5 point from start and -5 at the end
 
-        # x_p1 = list(map(itemgetter(1), x_pts))
-        x_p2 = list(map(itemgetter(2), x_pts))
+        x_p1 = list(map(itemgetter(1), x_pts))
+        # x_p2 = list(map(itemgetter(2), x_pts))
         # x_p3 = list(map(itemgetter(3), x_pts))
         # x_p4 = list(map(itemgetter(4), x_pts))
         # x_p5 = list(map(itemgetter(5), x_pts))
 
         plt.figure(2)
         plt.title('Segmentation')
-        # plt.scatter(time_pt, x_p1)  # padel_angle
-        plt.scatter(time_pt, x_p2) # engine-speed
+        plt.scatter(time_pt, x_p1)  # padel_angle
+        # plt.scatter(time_pt, x_p2) # engine-speed
         # plt.scatter(time_pt, x_p3) #
         # plt.scatter(time_pt, x_p4) # AF the value of our interest
-        # plt.scatter(time_pt, x_p5) # controller_mode
+        # plt.scatter(time_pt, x_p5) # controller_mode for AT speed
         # plt.xlim([0, 3])    #Navigation
         # plt.ylim([0, 3])   #Navigation
         # plt.xlim([0, 10])  # chasing cars      plt.scatter(x_p1)
@@ -180,6 +180,9 @@ def plot_segmentation(res, L_y, t_list, Y):
         plt.xlim([0, 20])  # Oscillator
         plt.ylim([-1, 1])  # Oscillator
         # plt.ylim([-1.5, 1.5])
+
+        # plt.xlim([0, 20])  # AT
+        # plt.ylim([0, 125])  # AT
 
         # plt.xlim([0, 5])  # time-horizon for Lorenz Attractor
         # plt.ylim([-30, 50])  # height for Lorenz Attractor
