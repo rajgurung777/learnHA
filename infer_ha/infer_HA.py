@@ -5,7 +5,9 @@ This is the main module for inferring an HA model.
 
 import sys  # This is used for command line arguments
 
+# from infer_ha.segmentation.segmentation import two_fold_segmentation_new, segmented_trajectories
 from infer_ha.segmentation.segmentation import two_fold_segmentation, segmented_trajectories
+
 from infer_ha.clustering.clustering import select_clustering
 from infer_ha.infer_invariants.invariants import compute_mode_invariant
 from infer_ha.libsvm.svmutil import *
@@ -61,6 +63,9 @@ def infer_model(list_of_trajectories, learning_parameters):
     variableType_datastruct =  learning_parameters['variableType_datastruct'] # processed and stored in data-struct
     isInvariant = learning_parameters['is_invariant']
 
+    methods = learning_parameters['methods']
+
+
     mode_inv = []
     transitions = []
 
@@ -106,7 +111,8 @@ def infer_model(list_of_trajectories, learning_parameters):
     # Segment and fit
     # res, drop, clfs = segment_and_fit(A, b1, b2, ytuple,ep) #Amit: uses the simple relative-difference between forward and backward BDF presented in the paper, Algorithm-1.
     # res, drop, clfs, res_modified = segment_and_fit_Modified_two(A, b1, b2, ytuple,ep)
-    res, drop, clfs, res_modified = two_fold_segmentation(A, b1, b2, ytuple, size_of_input_variables, ep)
+    # res, drop, clfs, res_modified = two_fold_segmentation_new(A, b1, b2, ytuple, size_of_input_variables, methods, ep)
+    res, drop, clfs, res_modified = two_fold_segmentation(A, b1, b2, ytuple, size_of_input_variables, methods, ep)
     print("Number of segments, len(res)=", len(res))
     res = res_modified  #TODO: We can comment this if this fix is not required. Now guard is closer to the boundary
 
@@ -125,7 +131,7 @@ def infer_model(list_of_trajectories, learning_parameters):
     # ********* Plotting/Visualizing various points for debugging *************************
     # plotdebug.plot_guard_points(segmentedTrajectories, L_y, t_list, Y) # pre-end and end points of each segment
     # plotdebug.plot_reset_points(segmentedTrajectories_modified, L_y, t_list, Y) # plotting Reset or Start points
-    plotdebug.plot_segmentation(res, L_y, t_list, Y) # Trying to verify the segmentation for each segmented points
+    # plotdebug.plot_segmentation(res, L_y, t_list, Y) # Trying to verify the segmentation for each segmented points
 
     number_of_segments_before_cluster = len(res)
     P, G = select_clustering(res, A, b1, clfs, Y, t_list, L_y, learning_parameters) # when len(res) < 2 compute P and G for the single mode
