@@ -23,6 +23,10 @@ def compute_assignments(list_connection_pt, L_y, Y):
         id0 = connection_pt[2]  # Now index is [2] for start_posi
         y_pts.append([Y[id0, dim] for dim in range(L_y)])
 
+    # print("x_pts =", x_pts)
+    # print()
+    # print("y_pts =", y_pts)
+
     # lin_reg = linear_model.LinearRegression(fit_intercept=False)  # without intercepts
     lin_reg = linear_model.LinearRegression()  # with intercepts
     lin_reg = lin_reg.fit(x_pts, y_pts)

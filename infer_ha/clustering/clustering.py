@@ -12,13 +12,17 @@ The learning algorithm is currently designed by focusing on the DTW algorithm.
 from infer_ha.clustering.cluster_by_dtw import cluster_by_dtw
 from infer_ha.clustering.cluster_by_others import dbscan_cluster, merge_cluster_tol2
 
-def select_clustering(res, A, b1, clfs, Y, t_list, L_y, learning_parameters):
+def select_clustering(segmented_traj, A, b1, clfs, Y, t_list, L_y, learning_parameters):
     """
     A wrapper module that enables the selection of different approaches to the clustering algorithm.
 
-    :param res: is a list of the segmented trajectory (positions). Each item of the list res contains a list of values
-        which are positions of points of trajectories. The size of the list res is the total number of segments
-        obtained.
+    :param segmented_traj: is a list of a custom data structure consisting of segmented trajectories (positions). Each item
+        of the list contains a tuple of the form ([start_ode, end_ode], [start_exact, end_exact], [p_1, ... , p_n]).
+        The Tuple has 3 items:
+            (1) first a list of two values for recording start and end points for learning ODE
+            (2) second a list of two values for recording start and end points for learning guard and assignment using the
+            exact point of jump
+            (3) third the list of values represent the positions of points of the trajectories.
     :param A: For every point of a trajectory the coefficients of the monomial terms obtained using the \Phi
          function (or the mapping function) as mention in Jin et al. paper.
     :param b1: the derivatives of each point computed using the backward version of BDF.
@@ -30,7 +34,9 @@ def select_clustering(res, A, b1, clfs, Y, t_list, L_y, learning_parameters):
     :param learning_parameters: is a dictionary data structure having the list of commandline arguments passed by the
         user for the learning algorithm.
     :return: The computed cluster and the coefficients of the polynomial ODE.
-        P: is a list containing the list of positions of each cluster and
+        P_modes: holds a list of modes. Each mode is a list of structures; we call it a segment.
+        Thus, P = [mode-1, mode-2, ... , mode-n] where mode-1 = [ segment-1, ... , segment-n] and segments are
+        of type ([start_ode, end_ode], [start_exact, end_exact], [p1, ..., p_n]).
         G: is a list containing the list of the coefficients of the polynomial ODE.
     """
 
@@ -46,21 +52,25 @@ def select_clustering(res, A, b1, clfs, Y, t_list, L_y, learning_parameters):
     dbscan_eps_dist = learning_parameters['dbscan_eps_dist']
     dbscan_min_samples = learning_parameters['dbscan_min_samples']
 
-    P = []
+    P_modes = []
     G = []
     # Choice of Clustering Algorithm
-    if len(res) > num_mode:  # clustering is required only if segmentation finds more segments than required modes
+    if len(segmented_traj) > num_mode:  # clustering is required only if segmentation finds more segments than required modes
         if method == "piecelinear":
-            print("Running the Merge-clustering algorithm!!")
-            P, G = merge_cluster_tol2(res, A, b1, num_mode, ep)  # This is Algo-2:InferByMerge function in Jin et al.
+            print("We do not support this clustering algorithm!!")
+            exit(1)
+            P_modes, G = merge_cluster_tol2(res, A, b1, num_mode, ep)  # This is Algo-2:InferByMerge function in Jin et al.
             # Todo: note this approach does not scale well in clustering high number of segments into low modes.
 
     if method == "dbscan":
         print("Running DBSCAN clustering algorithm!!")
-        P, G = dbscan_cluster(clfs, res, A, b1, num_mode, dbscan_eps_dist, dbscan_min_samples)
+        P_modes, G = dbscan_cluster(clfs, segmented_traj, A, b1, num_mode, dbscan_eps_dist, dbscan_min_samples, size_of_input_variables)
+        print("Total Clusters after DBSCAN algorithm = ", len(P_modes))
+
     if method == "dtw":
         print("Running clustering using  DTW algorithm!!")
-        P, G = cluster_by_dtw(res, A, b1, Y, t_list, L_y, correl_threshold,
+        P_modes, G = cluster_by_dtw(segmented_traj, A, b1, Y, t_list, L_y, correl_threshold,
                               distance_threshold, size_of_input_variables, maximum_ode_prune_factor) # t_list only used for debugging using plot
+        print("Total Clusters after DTW algorithm = ", len(P_modes))
 
-    return P, G
+    return P_modes, G

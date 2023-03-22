@@ -1,27 +1,34 @@
 
 import numpy as np
 
-def get_signal_data(res, Y, L_y, t_list, size_of_input_variables):
+def get_signal_data(segmented_traj, Y, L_y, t_list, size_of_input_variables):
     """
     This is a pre-processing function to obtain the actual signal points of the segmented trajectories.
 
-    :param res: is a list of the segmented trajectory (positions). Each item of the list res contains a list of values
-        which are positions of points of trajectories. The size of the list res is the total number of segments
-        obtained.
+    :param segmented_traj: is a list of a custom data structure consisting of segmented trajectories (positions). Each item
+        of the list contains a tuple of the form ([start_ode, end_ode], [start_exact, end_exact], [p_1, ... , p_n]).
+        The Tuple has 3 items:
+            (1) first a list of two values for recording start and end points for learning ODE
+            (2) second a list of two values for recording start and end points for learning guard and assignment using the
+            exact point of jump
+            (3) third the list of values represent the positions of points of the trajectories.
     :param Y: contains the y_list values for all the points except the first and last M points (M is the order in BDF).
     :param L_y: is the dimension (input + output variables) of the system whose trajectory is being parsed.
     :param t_list: a single-item list whose item is a numpy.ndarray containing time-values as a concatenated list.
     :param size_of_input_variables: total number of input variables in the given trajectories.
-    :return: The segmented signal data points (f_ode) and the corresponding time values (t_ode). The time values t_ode
-            is only used for debugging purposes, mainly for plotting. Note that the signal returned is projected only
-            on the output variables.
+    :return: The segmented signal's actual data points (f_ode) and the corresponding time values (t_ode).
+            The time values t_ode is only used for debugging purposes, mainly for plotting.
+            Note that the signal returned is projected only on the output variables.
     """
 
     f_ode = []
     t_ode = []
     # print("len of res=", len(res))
-    for i in range(0, len(res)):
-        segData = res[i]        # has only the data positions
+    for seg_element in segmented_traj:
+
+        segData = seg_element[2]  # access the third item of the tuple that has only the data positions
+        # ToDo: instead of taking the exact points, for better ODE comparison use segment excluding boundary-points
+
         time_data = []
         # print("leg(segData) is ", len(segData))
         signalData = []
@@ -31,7 +38,7 @@ def get_signal_data(res, Y, L_y, t_list, size_of_input_variables):
 
             time_data.append(t_list[0][pos_id + 5])  # since Y values are after leaving 5 point from start and -5 at the end
         f_ode.append(signalData)
-        t_ode.append(time_data)     # computing time only for plotting reason
+        t_ode.append(time_data)  # computing time only for plotting reason
 
     return f_ode, t_ode
 
@@ -129,3 +136,113 @@ def compute_correlation(path, signal1, signal2):
     # print("min correlation value =", correlation_value)
 
     return correlation_value
+
+
+def create_simple_modes_positions(P_modes):
+    """
+      This function transforms/creates a simple data structure from P_modes. The structure is a list of modes.
+      Each mode in the list holding only the position values of data points as a single concatenated list. Unlike the
+      input argument P_modes is a structure with list of modes and each mode has one or more segments in the mode-list.
+
+      :param P_modes: holds a list of modes. Each mode is a list of structures; we call it a segment.
+          Thus, P = [mode-1, mode-2, ... , mode-n] where mode-1 = [ segment-1, ... , segment-n] and segments are
+          of type ([start_ode, end_ode], [start_exact, end_exact], [p1, ..., p_n]).
+      :return:
+          P: holds a list of modes. Each mode is a list of positions. Note here we return all the positions using the
+          exact list (including both start_exact and end_exact).
+      """
+
+    P = []
+    for mode in P_modes:
+        data_pos = []
+        for segs in mode:
+            # make a simple mode
+            data_pos.extend(segs[2])    # merge/extend only the positions of the segment
+        P.append(data_pos)
+
+    return P
+
+
+def create_simple_modes_positions_for_ODE(P_modes):
+    """
+      This function transforms/creates a "simple data" structure from P_modes. This simple structure is a list of modes.
+      Each mode in the list holding only the position values of data points as a single concatenated list. Unlike the
+      input argument P_modes is a structure with list of modes and each mode has one or more segments in the mode-list.
+
+      :param P_modes: holds a list of modes. Each mode is a list of structures; we call it a segment.
+          Thus, P = [mode-1, mode-2, ... , mode-n] where mode-1 = [ segment-1, ... , segment-n] and segments are
+          of type ([start_ode, end_ode], [start_exact, end_exact], [p1, ..., p_n]).
+      :return:
+          P: holds a list of modes. Each mode is a list of positions.
+          Note here we return all the positions of points that lies inside the boundary (excluding the exact points).
+      """
+
+    P = []
+    for mode in P_modes:
+        data_pos = []
+        for segs in mode:
+            # make a simple mode
+            start_ode = segs[0][0]
+            end_ode = segs[0][1]
+            inexact_seg = list(range(start_ode, end_ode))   # making the list instead of filtering [p1, ..., p_n]
+            data_pos.extend(inexact_seg)    # merge/extend only the inexact positions of the segment
+        P.append(data_pos)
+
+    return P
+
+def create_simple_per_segmented_positions(segmented_traj):
+    """
+    This function transforms/creates a simple list structure from segmented_traj. This simple list consists of positions.
+    Each item of the list holds only the position values of data points after segmentation.
+
+    :param segmented_traj: is a list of a custom data structure consisting of segmented trajectories (positions). Each item
+    of the list contains a tuple of the form ([start_ode, end_ode], [start_exact, end_exact], [p_1, ... , p_n]).
+    The Tuple has 3 items:
+        (1) first a list of two values for recording start and end points for learning ODE
+        (2) second a list of two values for recording start and end points for learning guard and assignment using the
+        exact point of jump
+        (3) third the list of values represent the positions of points of the trajectories.
+    :return:
+      res: a simple list of positions of the segmented trajectories. Segmented positions is a list containing
+      positions of points in the trajectories.
+      Note here we return all the positions of points that lies inside the boundary (excluding the exact points).
+      This is particularly suitable for ODE inference.
+    """
+
+    res = []
+    for segs in segmented_traj:
+        # segs a tuple of the form ([start_ode, end_ode], [start_exact, end_exact], [p_1, ... , p_n]).
+        start_ode = segs[0][0]
+        end_ode = segs[0][1]
+        inexact_seg = list(range(start_ode, end_ode + 1))   # making the list instead of searching/filtering from [p1, ..., p_n]
+        res.append(inexact_seg)
+
+    return res
+
+def create_simple_per_segmented_positions_exact(segmented_traj):
+    """
+    This function transforms/creates a simple list structure from segmented_traj. This simple list consists of positions.
+    Each item of the list holds only the position values of data points after segmentation.
+
+    :param segmented_traj: is a list of a custom data structure consisting of segmented trajectories (positions). Each item
+    of the list contains a tuple of the form ([start_ode, end_ode], [start_exact, end_exact], [p_1, ... , p_n]).
+    The Tuple has 3 items:
+        (1) first a list of two values for recording start and end points for learning ODE
+        (2) second a list of two values for recording start and end points for learning guard and assignment using the
+        exact point of jump
+        (3) third the list of values represent the positions of points of the trajectories.
+    :return:
+      res: a simple list of positions of the segmented trajectories. Segmented positions is a list containing
+      positions of points in the trajectories.
+      Note here we return all the positions of points of a segment (including the exact points or boundary points).
+
+    """
+
+    res = []
+    for segs in segmented_traj:
+        # segs a tuple of the form ([start_ode, end_ode], [start_exact, end_exact], [p_1, ... , p_n]).
+
+        exact_seg = segs[2]   # last element of the tuple i.e., [p1, ..., p_n]
+        res.append(exact_seg)
+
+    return res

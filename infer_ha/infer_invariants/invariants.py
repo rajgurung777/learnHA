@@ -7,13 +7,17 @@ A more complex approach can be implemented and tested in this module.
 
 from operator import itemgetter
 
+from infer_ha.clustering.utils import create_simple_modes_positions
 
-def compute_mode_invariant(L_y, P, Y, invariant_enabled):
+
+def compute_mode_invariant(L_y, P_modes, Y, invariant_enabled):
     """
     This function decides to compute or ignore mode-invariant computation based on the user's choice.
 
     :param L_y: is the dimension (input + output variables) of the system whose trajectory is being parsed.
-    :param P: is a list containing the list of positions of each cluster or mode.
+    :param P_modes: hols a list of modes. Each mode is a list of structures; we call it a segment.
+          Thus, P = [mode-1, mode-2, ... , mode-n] where mode-1 = [ segment-1, ... , segment-n] and segments are
+          of type ([start_ode, end_ode], [start_exact, end_exact], [p1, ..., p_n]).
     :param Y: contains the y_list values for all the points except the first and last M points (M is the order in BDF).
     :param invariant_enabled: is the user's choice of computing or ignoring invariant. The value 0 and 1 to compute and
         2 for ignoring.
@@ -27,24 +31,29 @@ def compute_mode_invariant(L_y, P, Y, invariant_enabled):
     if invariant_enabled == 2:
         print("Computing Mode Invariant IGNORED!")
     else:
-        mode_inv = compute_invariant(L_y, P, Y)
+        mode_inv = compute_invariant(L_y, P_modes, Y)
         print("Computing Mode Invariant done!")
 
     return mode_inv
 
 
-def compute_invariant (L_y, P, Y):
+def compute_invariant (L_y, P_modes, Y):
     """
     This function computes the invariant for each mode/cluster.
 
     :param L_y: is the dimension (input + output variables) of the system whose trajectory is being parsed.
-    :param P: is a list containing the list of positions of each cluster or mode.
+    :param  P_modes: holds a list of modes. Each mode is a list of structures; we call it a segment.
+          Thus, P = [mode-1, mode-2, ... , mode-n] where mode-1 = [ segment-1, ... , segment-n] and segments are
+          of type ([start_ode, end_ode], [start_exact, end_exact], [p1, ..., p_n]).
     :param Y: contains the y_list values for all the points except the first and last M points (M is the order in BDF).
     :return: A list of values of type [mode-id, invariant-constraints]. mode-id is the location ID and
-       invariants-constraints is the list of (min,max) bounds of each variable. The order of the variable is maintained.
+       invariants-constraints is the list of (min,max) bounds of each variable.
+       The order of the variable is maintained in the list.
 
 
     """
+
+    P = create_simple_modes_positions(P_modes)
 
     x_pts = []
     #for each mode i

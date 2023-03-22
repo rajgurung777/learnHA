@@ -1,7 +1,13 @@
+import os
+
 import matplotlib.pyplot as plt
 
 from operator import itemgetter
 import itertools
+
+from infer_ha.clustering.utils import create_simple_per_segmented_positions_exact
+from infer_ha.utils.util_functions import rel_diff
+
 
 def plot_signals(timeSignal1, Signal1, timeSignal2, Signal2):
     # Note Signal1 and Signal2 only has output variables
@@ -193,6 +199,90 @@ def plot_segmentation(res, L_y, t_list, Y):
         # if imode == 10:
         #     break
 
+
+def plot_segmentation_new(segmented_traj, L_y, t_list, Y):
+    """
+
+    @param segmented_traj: is a list of a custom data structure consisting of segmented trajectories (positions). Each item
+        of the list contains tuple of the form ([start_ode, end_ode], [start_exact, end_exact], [p_1, ... , p_n]).
+        The Tuple has three items:
+            (1) first, a list of two values for recording start and end points for learning ODE
+            (2) second, a list of two values for recording start and end points for learning guard and assignment using
+            the exact point of a jump
+            (3) third, a list of values representing the position of points of the trajectories.
+    @param L_y: is the dimension of the system
+    @param t_list: is the list of time step values for each Y values
+    @param Y: is the list of values of the system. Y can be n-dimensional
+    @return:
+    """
+
+    res = create_simple_per_segmented_positions_exact(segmented_traj)
+
+    for imode in range(0, len(res)):
+        x_pts = []
+        x_p1 = []
+        x_p2 = []
+        x_p3 = []
+        x_p4 = []
+        x_p5 = []
+        time_pt = []
+        for id0 in res[imode]:  # Note: P contains list of clustered segments each segments contains the positions
+            x_pts.append({dim + 1: Y[id0, dim] for dim in range(L_y)})
+            time_pt.append(t_list[0][id0 + 5])  # since Y values are after leaving 5 point from start and -5 at the end
+
+        # x_p1 = list(map(itemgetter(1), x_pts))
+        # x_p2 = list(map(itemgetter(2), x_pts))
+        x_p3 = list(map(itemgetter(3), x_pts))
+        # x_p4 = list(map(itemgetter(4), x_pts))
+        # x_p5 = list(map(itemgetter(5), x_pts))
+
+        plt.figure(2)
+        plt.title('Segmentation')
+        # plt.scatter(time_pt, x_p1)  # padel_angle
+        # plt.scatter(time_pt, x_p2) # engine-speed
+        plt.scatter(time_pt, x_p3) #engine-speed
+        # plt.scatter(time_pt, x_p4) # AF the value of our interest
+        # plt.scatter(time_pt, x_p5) # controller_mode for AT speed
+        # plt.xlim([0, 3])    #Navigation
+        # plt.ylim([0, 3])   #Navigation
+        # plt.xlim([0, 10])  # chasing cars      plt.scatter(x_p1)
+        # plt.ylim([0, 2500])  # chasing cars
+
+        # plt.xlim([0, 50])   #AFC
+        # plt.ylim([14.5, 15.5])   #AFC for x_p4 the AF variable
+
+        # plt.xlim([0, 10])  # Two Tanks      plt.scatter(x_p3)
+        # plt.ylim([-1, 2])  # Two Tanks
+
+        plt.xlim([0, 10])  # Engine Timing System      plt.scatter(x_p3)
+        plt.ylim([1900, 3100])  # Engine Timing System
+        #
+        # plt.xlim([0, 10])  # Engine Timing System
+        # plt.ylim([10, 100])  # Engine Timing System    plt.scatter(x_p2)
+
+
+        # plt.xlim([-1, 500])  # Excitable Cell Model      plt.scatter(x_p1)
+        # plt.ylim([-80, 60])  # Excitable Cell Model
+        # plt.xlim([0, 15])   #BBall
+        # plt.ylim([0, 25])   #BBall
+        # plt.xlim([0, 20])  # Oscillator
+        # plt.ylim([-1, 1])  # Oscillator
+        # plt.ylim([-1.5, 1.5])
+
+        # plt.xlim([0, 20])  # AT
+        # plt.ylim([0, 125])  # AT
+
+        # plt.xlim([0, 5])  # time-horizon for Lorenz Attractor
+        # plt.ylim([-30, 50])  # height for Lorenz Attractor
+
+        # plt.xlim([-3, 3])  # time-horizon for Ven Der Pol Oscillator
+        # plt.ylim([-3, 3])  # height for Ven Der Pol Oscillator
+    plt.show()
+        # if imode == 10:
+        #     break
+
+
+
 def plot_dropped_points(t_list, L_y, Y, Drop):
 
     x_pts = []
@@ -309,3 +399,64 @@ def plot_after_clustering(t_list, L_y, P, Y):
     plt.show()
     # plt.show()
     # print("Mode-invariants =", mode_inv)
+
+def plot_data_values(segmentedTrajectories, Y, L_y):
+    """
+    Helps in debugging
+
+    @param segmentedTrajectories: the required position data structures. Is a list, each item is of the
+        form (start_segment_pos, pre_end_segment_pos, end_segment_pos). This list structure is used later in learning
+        transition's guard and assignment equations.
+        An example of the values in segmentedTrajectories data structure is
+        [[[0, 360, 361], [362, 701, 702], [703, 973, 974], [975, 1191, 1192]], [[1295, 1666, 1667], [1668, 2009, 2010],
+         [2011, 2284, 2285], [2286, 2504, 2505]]]
+    @return:
+    """
+    for traj in segmentedTrajectories:
+        for seg in traj:
+            start = seg[0]
+            pre_end = seg[1]
+            end = seg[2]
+            print("start=",print_data_value(start,Y,L_y))
+            print("pre_end=",print_data_value(pre_end,Y,L_y))
+            print("end=",print_data_value(end,Y,L_y))
+
+def print_data_value(position, Y, dimension):
+    x_pts = []
+    x_pts.append({dim + 1: Y[position, dim] for dim in range(dimension)})
+
+    return x_pts
+
+def output_derivatives(b1, b2, Y, size_of_input_variables):
+    if os.path.exists("outputs/amit_backward.txt"):
+        os.remove("outputs/amit_backward.txt")
+    file_out = open("outputs/amit_backward.txt","a")
+    file_out.write("b1 backward derivatives: ")
+    str1 = ""
+    pos_value = 0
+    relDiff = 0.0
+    for i in range(0, len(b1)):
+        # if (i==0):
+        #     print(type(b1[i, size_of_input_variables:]))
+        if (i!=0 and i != len(b1)):
+            relDiff = rel_diff(b1[i, size_of_input_variables:], b1[(i-1), size_of_input_variables:])  # compute relative difference between current and previous
+        # str1 = "pos:" + str(pos_value) + " b1[i] = " + str(b1[i]) + "  b1[i,onlyOutVar] = " + str(b1[i, size_of_input_variables:]) + "  relDiff = " + str(relDiff) + " \n"
+        str1 = "pos: " + str(i) + " Y: " + str(Y[i, size_of_input_variables:]) + " b1: " + str(b1[i, size_of_input_variables:]) + " relBDF_Diff = " + str(relDiff) + "\n"
+        # pos_value += 1
+        file_out.write(str1)
+    file_out.close()
+
+    if os.path.exists("outputs/amit_forward.txt"):
+        os.remove("outputs/amit_forward.txt")
+    file_out2 = open("outputs/amit_forward.txt", "a")
+    file_out2.write("b2 forward derivatives: ")
+    pos_value = 0
+    relDiff = 0.0
+    for i in range(0, len(b2)):
+        if (i!=0 and i != len(b2)):
+            relDiff = rel_diff(b2[i], b2[i-1])  # compute relative difference between current and previous
+        # str1 = "pos:" + str(pos_value) + "   " +  str(b2[i]) + "  relDiff = " + str(relDiff) + " \n"
+        str1 = "pos: " + str(i) + " Y: " + str(Y[i, size_of_input_variables:])  + " b2: " + str(b2[i, size_of_input_variables:]) + " relFwd_Diff = " + str(relDiff) + "\n"
+        # pos_value += 1
+        file_out2.write(str1)
+    file_out2.close()

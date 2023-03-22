@@ -14,7 +14,6 @@ methods = ['dbscan', 'piecelinear', 'dtw']
 def runLearnHA():  # Calling the implementation from project BBC4CPS
     # input_filename, output_filename, list_of_trajectories, learning_parameters = read_command_line(sys.argv)
     parameters = read_commandline_arguments()   # reads the command line values also can use -h to see help on usages
-    # Todo: (1) remove position from the parameters and do it in the main infer_HA process
 
     num_mode = parameters['modes']
     input_filename = parameters['input_filename']
@@ -34,17 +33,17 @@ def runLearnHA():  # Calling the implementation from project BBC4CPS
     start = time.time()
     #################################################################################################
     # P, G, mode_inv, transitions = learnHA.infer_model(list_of_trajectories, learning_parameters)
-    P, G, mode_inv, transitions, position = learnHA.infer_model(list_of_trajectories, parameters)
+    P_modes, G, mode_inv, transitions, position = learnHA.infer_model(list_of_trajectories, parameters)
     # Note P is the Segmented data. G is the coefficients of the ODE and boundary is the guard conditions
     #################################################################################################
     end = time.time()
     total_learning_time = end - start
     # print("******************* How is this happening *******************")
     print("inferring_time = ", total_learning_time)
-    print("Number of modes chosen =", num_mode)
-    print("Number of modes learned = ", len(P))
+    # print("Number of modes chosen =", num_mode)
+    # print("Number of modes learned = ", len(P_modes))
 
-    print_HA(P, G, mode_inv, transitions, position, parameters, output_filename)   # prints an HA model file inside the folder outputs/
+    print_HA(P_modes, G, mode_inv, transitions, position, parameters, output_filename)   # prints an HA model file inside the folder outputs/
 
     return
 

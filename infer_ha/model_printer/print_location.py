@@ -1,11 +1,14 @@
+from infer_ha.clustering.utils import create_simple_modes_positions
 from infer_ha.model_printer.print_invariant import *
 from infer_ha.model_printer.print_flow import *
 
-def print_location(f_out, P, G, mode_inv, Exp, position):
+def print_location(f_out, P_modes, G, mode_inv, Exp, position):
     """
     :param f_out: file pointer where the output is printed.
-    :param P: is a list. Each item of the list P contain list of values which are positions of points of a trajectories.
-           The size of the list P is equal to the number of clusters or modes of the learned hybrid automaton (HA).
+    :param P_modes: holds a list of modes. Each mode is a list of structures; we call it a segment.
+           Thus, P = [mode-1, mode-2, ... , mode-n] where mode-1 = [ segment-1, ... , segment-n] and segments are
+           of type ([start_ode, end_ode], [start_exact, end_exact], [p1, ..., p_n]).
+           The size of the list P_modes is equal to the number of clusters or modes of the learned hybrid automaton (HA).
     :param G: is a list. Each item of the list G is a list that holds the coefficients (obtained using linear regression)
            of the ODE of a mode of the learned HA.
     :param mode_inv: is a list with items of type [mode-id, invariant-constraints]. Where mode-id is the location number
@@ -17,7 +20,7 @@ def print_location(f_out, P, G, mode_inv, Exp, position):
     """
     # ****** Writing the initial mode before so that Automaton gets the initial location ID. ******
 
-    initial_location_list = get_initial_location(P, position)
+    initial_location_list = get_initial_location(P_modes, position)
     # print("initial_location_list = ", initial_location_list)
     # initVal = "Initial-mode " + str(indexVal + 1) + "\n"
     initVal = "Initial-mode " + str(initial_location_list[0] + 1) + "\n"    # Old implementation writing only a single
@@ -35,22 +38,28 @@ def print_location(f_out, P, G, mode_inv, Exp, position):
         print_invariant(f_out, mode_inv, modeID)
         print_flow_dynamics(f_out, G, modeID, Exp)
 
-def get_initial_location(P, position):
+def get_initial_location(P_modes, position):
     """
     At the moment we are printing only the mode-ID where the first/starting trajectory is contained in.
     Finding other initial modes, require searching segmented trajectories and identifying the probable initial positions
     of the trajectories. Probable because we still drop points during segmentation (the start-point of a segmented trajectory).
-    This dropping of points (in addition to the first M points, where M is the step in LMM) makes is hard to track the
+    This dropping of points (in addition to the first M points, where M is the step in LMM) makes it hard to track the
     position of the initial trajectories using the data-structure position.
 
-    @param P: is a list. Each item of the list P contain list of values which are positions of points of a trajectories.
+    @param P_modes: holds a list of modes. Each mode is a list of structures; we call it a segment.
+           Thus, P = [mode-1, mode-2, ... , mode-n] where mode-1 = [ segment-1, ... , segment-n] and segments are
+           of type ([start_ode, end_ode], [start_exact, end_exact], [p1, ..., p_n]).
            The size of the list P is equal to the number of clusters or modes of the learned hybrid automaton (HA).
     @param position: is a list containing positions for the input list-of-trajectories.
-    @return: init_locations: contains a list of initial location ID(s), having zero based indexing.
+    @return:
+        init_locations: contains a list of initial location ID(s), having zero based indexing.
 
     """
     # print("P = ", P)
     # print("position = ", position)
+
+    P = create_simple_modes_positions(P_modes)
+
     init_locations = []
     val = P[0][0]  # first mode
     # print("P[0][0] = val =", val)
@@ -61,6 +70,8 @@ def get_initial_location(P, position):
             indexVal = mods
 
     init_locations.append(indexVal)
+
+    # ToDo: to find all initial location/mode, use the structure segmented_traj: 1st position of each trajectory
 
 
     return init_locations

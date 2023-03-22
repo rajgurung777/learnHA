@@ -13,6 +13,15 @@ def mat_norm(A):
 
 
 def rel_diff(A, B):
+    """
+    Computes a relative difference between A and B data structure
+    @param A: can be a matrix (list of list) or numpy array.
+    @param B: can be a matrix (list of list) or numpy array.
+    @return:
+        Relative difference between A and B.
+        We simply return norm(A - B) if norm(A) + norm(B) == 0
+        Here we consider the Euclidean norm.
+    """
     if (mat_norm(A) + mat_norm(B)) == 0:
         return mat_norm(A - B)    # fixing division by zero error
     else:

@@ -8,13 +8,15 @@ from infer_ha.infer_transitions.compute_assignments import compute_assignments
 from infer_ha.infer_transitions.guards import getGuard_inequality
 
 
-def compute_transitions(P, position, segmentedTrajectories, L_y, boundary_order, Y, variableType_datastruct,
+def compute_transitions(P_modes, position, segmentedTrajectories, L_y, boundary_order, Y, variableType_datastruct,
                         number_of_segments_before_cluster, number_of_segments_after_cluster):
     """
     This function decides to compute or ignore mode-invariant computation based on the user's choice.
 
 
-    :param P: is a list containing the list of positions of each cluster or mode.
+    :param P_modes: holds a list of modes. Each mode is a list of structures; we call it a segment.
+        Thus, P = [mode-1, mode-2, ... , mode-n] where mode-1 = [ segment-1, ... , segment-n] and segments are
+        of type ([start_ode, end_ode], [start_exact, end_exact], [p1, ..., p_n]).
     :param position: is a list of position data structure. Each position is a pair (start, end) position of a trajectory.
         For instance, the first item of the list is [0, 100] means that the trajectory has 101 points. The second item
         as [101, 300], meaning the second trajectory has 200 points. Note that all the trajectories are concatenated.
@@ -34,9 +36,10 @@ def compute_transitions(P, position, segmentedTrajectories, L_y, boundary_order,
 
     """
     # print("Computing Connecting points for Transitions ...")
-    data_points = create_connecting_points(P, position, segmentedTrajectories)
+    data_points = create_connecting_points(P_modes, position, segmentedTrajectories)
     print("Computing Connecting points done!")
-    print("len(data_points) =",len(data_points))
+    # print("len(data_points) =",len(data_points))
+    # print("data_points=", data_points)
 
     transitions = []
 
@@ -73,7 +76,7 @@ def compute_transitions(P, position, segmentedTrajectories, L_y, boundary_order,
 
         guard_coeff = getGuard_inequality(srcData, destData, L_y, boundary_order, Y)
 
-        print("Check guard=", guard_coeff)
+        # print("Check guard=", guard_coeff)
 
         '''
         We will not check any complex condition. We simply apply linear regression to first learn the assignments.
@@ -81,6 +84,7 @@ def compute_transitions(P, position, segmentedTrajectories, L_y, boundary_order,
          the computed (learned using linear regression) values using our approach of annotations.
         '''
 
+        # print("list_connection_pt = ", list_connection_pt)
         assign_coeff, assign_intercept = compute_assignments(list_connection_pt, L_y, Y)
         assignment_coeff = assign_coeff
         assignment_intercept = assign_intercept

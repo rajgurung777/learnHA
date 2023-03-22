@@ -1,8 +1,10 @@
 """
 Connecting points for inferring transitions
 """
+from infer_ha.clustering.utils import create_simple_modes_positions
 
-def create_connecting_points(P, position, segmentedTrajectories):
+
+def create_connecting_points(P_modes, position, segmentedTrajectories):
     """
     Determine connecting points from the segmented trajectories concerning clusters. Our idea is to establish
     connections by determining segments' start and end positions/points on either mode (src and dest modes). We plan to
@@ -11,10 +13,13 @@ def create_connecting_points(P, position, segmentedTrajectories):
     [pre_end_posi, end_posi, start_posi], where pre_end_posi and end_posi positions are on the source location, and
     start_posi is the position of the starting point of a segment in the destination location.
 
-    :param P: is a list containing the list of positions of each cluster or mode.
+    :param P_modes: holds a list of modes. Each mode is a list of structures; we call it a segment.
+          Thus, P = [mode-1, mode-2, ... , mode-n] where mode-1 = [ segment-1, ... , segment-n] and segments are
+          of type ([start_ode, end_ode], [start_exact, end_exact], [p1, ..., p_n]).
     :param position: is a list of position data structure. Each position is a pair (start, end) position of a trajectory.
-        For instance, the first item of the list is [0, 100] means that the trajectory has 101 points. The second item
-        as [101, 300], meaning the second trajectory has 200 points. Note that all the trajectories are concatenated.
+        For instance, the first item of the list [0, 100] means that the trajectory has 101 points.
+        The second item as [101, 300], meaning the second trajectory has 200 points.
+        Note that all the trajectories are concatenated.
     :param segmentedTrajectories: is a data structure containing the positions of the segmented trajectories that keeps
         track of the connections between them.
     :return: 'datapoints' is a list of data points that holds a connection between a source and destination location.
@@ -23,6 +28,8 @@ def create_connecting_points(P, position, segmentedTrajectories):
         destination location.
 
     """
+
+    P = create_simple_modes_positions(P_modes)
 
     cluster_len = len(P)
     traj_size = len(position)

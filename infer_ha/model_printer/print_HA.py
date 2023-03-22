@@ -10,11 +10,13 @@ from infer_ha.model_printer.print_location import *
 from infer_ha.model_printer.print_transition import *
 
 
-def print_HA(P, G, mode_inv, transitions, position, learning_parameters, outputfilename):
+def print_HA(P_modes, G, mode_inv, transitions, position, learning_parameters, outputfilename):
     """
 
-    :param P: is a list. Each item of the list P contain list of values which are positions of points of a trajectories.
-           The size of the list P is equal to the number of clusters or modes of the learned hybrid automaton (HA).
+    :param P_modes: holds a list of modes. Each mode is a list of structures; we call it a segment.
+           Thus, P = [mode-1, mode-2, ... , mode-n] where mode-1 = [ segment-1, ... , segment-n] and segments are
+           of type ([start_ode, end_ode], [start_exact, end_exact], [p1, ..., p_n]).
+           The size of the list P_modes is equal to the number of clusters or modes of the learned hybrid automaton (HA).
     :param G: is a list. Each item of the list G is a list that holds the coefficients (obtained using linear regression)
            of the ODE of a mode of the learned HA.
     :param mode_inv: is a list with items of type [mode-id, invariant-constraints]. Where mode-id is the location number
@@ -39,7 +41,7 @@ def print_HA(P, G, mode_inv, transitions, position, learning_parameters, outputf
 
     maxorder = learning_parameters['ode_degree']
     boundary_order = learning_parameters['guard_degree']
-    num_mode = len(P)   # size returned by DTW clustering algorithm.
+    num_mode = len(P_modes)   # size returned by DTW clustering algorithm.
     total_ode_coeff = G[0].shape[1] # total columns of 1st location's ODE. Size is dimension + constant-intercept term
     system_dim = total_ode_coeff - 1 # minus the intercept term
     gene = generate.generate_complete_polynomial(system_dim, maxorder)
@@ -92,7 +94,7 @@ def print_HA(P, G, mode_inv, transitions, position, learning_parameters, outputf
 
     f_out = open(outputfilename, "a")  # Opening file-id for writing output
     print_header(f_out, num_mode, system_dim, transitions)
-    print_location(f_out, P, G, mode_inv, Exp, position)
+    print_location(f_out, P_modes, G, mode_inv, Exp, position)
     print_transition(f_out, transitions, system_dim, boundary_order)
     f_out.close()
 

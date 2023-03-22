@@ -27,6 +27,8 @@ def read_commandline_arguments():
                         default=1, required=False)
     parser.add_argument('--segmentation-error-tol', help='Maximal relative-difference (FwdBwd) error tolerated during segmentation. Set to 0.01 by default', type=float,
                         default=0.01, required=False)
+    parser.add_argument('--segmentation-fine-error-tol', help='Maximal relative-difference (Bwd) fine-error tolerated during segmentation. Set to 0.01 by default', type=float,
+                        default=0.01, required=False)
     parser.add_argument('--threshold-distance', help='Maximal threshold for distance in DTW clustering algorithm. Set to 0.1 by default',
                         type=float, default=0.1, required=False)
     parser.add_argument('--threshold-correlation', help='Maximal threshold for correlation value in DTW clustering algorithm. Set to 0.8 by default',
