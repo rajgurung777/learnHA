@@ -17,7 +17,7 @@ def print_transition(f_out, transitions, system_dim, boundary_order):
     # **** Computing the polynomial expression for guard ****
     coeff_expansion = myUtil.multinomial(system_dim+1, boundary_order)    # same formula as in getcoeff Function in SVM
     # coeff_expansion = myUtil.multinomial(L_y, boundary_order)    # todo: testing
-    # print ("coeff_expansion = ", coeff_expansion)
+    print ("coeff_expansion = ", coeff_expansion)
     gExp = [""] * int(len(coeff_expansion))
     # gExp = [""] * int(len(coeff_expansion)+1)   #todo testing
     coef_index = 0
@@ -46,12 +46,14 @@ def print_transition(f_out, transitions, system_dim, boundary_order):
 
     # print("Expression is ", gExp)
     gExp[len(coeff_expansion) - 1] = "1"
-    # print("Expression is ", gExp)
+    print("Expression is ", gExp)
 
     for tr in range(0, len(transitions)):
         src = transitions[tr][0]
         dest = transitions[tr][1]
         guard_coeff = transitions[tr][2]
+        if tr == 0:
+            print("guard_coeff =", guard_coeff)
         assign_coeffs = transitions[tr][3]
         intercepts = transitions[tr][4]
         # print("src=%d, dest=%d are " % (src + 1, dest + 1))

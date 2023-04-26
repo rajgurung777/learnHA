@@ -18,14 +18,24 @@ def runLearnHA():  # Calling the implementation from project BBC4CPS
     num_mode = parameters['modes']
     input_filename = parameters['input_filename']
     output_filename = parameters['output_filename']
-
+    default_user_stepsize = parameters['stepsize']
     list_of_trajectories, stepsize, system_dimension = parse_trajectories(input_filename)
+    step_size = default_user_stepsize
+
+    # Giving priority to user selected step-size and not the step-size in the trajectories
+    if default_user_stepsize == 0.01:   #default is 0.01
+        step_size = stepsize    # obtained step-size from the trajectories
+    else:
+        step_size = default_user_stepsize  # user provided some step-size
+
+    print("stepsize = ", step_size)
+    # stepsize = 0.01
     # print("list of trajectories is ",list_of_trajectories)
     variableType_datastruct = []  # structure that holds [var_index, var_name, var_type, pool_values]
     if len(parameters['variable_types']) >= 1:  # if user supply annotation arguments
         variableType_datastruct = process_type_annotation_parameters(parameters, system_dimension)
 
-    parameters['stepsize'] = stepsize   # we assume trajectories are sampled at fixed size time-step
+    parameters['stepsize'] = step_size   # we assume trajectories are sampled at fixed size time-step
     parameters['variableType_datastruct'] = variableType_datastruct
     # parameters['position'] = position
     end = time.time()  # creation of variable end

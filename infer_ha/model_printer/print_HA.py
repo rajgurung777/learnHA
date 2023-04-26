@@ -43,7 +43,10 @@ def print_HA(P_modes, G, mode_inv, transitions, position, learning_parameters, o
     boundary_order = learning_parameters['guard_degree']
     num_mode = len(P_modes)   # size returned by DTW clustering algorithm.
     total_ode_coeff = G[0].shape[1] # total columns of 1st location's ODE. Size is dimension + constant-intercept term
-    system_dim = total_ode_coeff - 1 # minus the intercept term
+
+    total_ode_rows = G[0].shape[0]  # total row of 1st location's ODE. Size is dimension
+    system_dim = total_ode_rows
+    # system_dim = total_ode_coeff - 1 # minus the intercept term
     gene = generate.generate_complete_polynomial(system_dim, maxorder)
     # print ("Gene matrix here ", gene)
     expression = ""  # list of terms as string

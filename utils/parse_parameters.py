@@ -232,6 +232,7 @@ def parse_trajectories(input_filename):
             colum = 1
             cc = 0
             all_y_pts = []
+            # print("test line =", line)
             for word in line.split():
                 if colum == 1:
                     if float(word) == 0.0:  # this check will be enabled only on new trajectory series
@@ -289,7 +290,9 @@ def parse_trajectories(input_filename):
     print("Type of y_list[0].shape[1]= ", y_list[0].shape[1])   # shape[0] for rows or records and shape[1] is cols or dimension
     # print("y_list = ", y_list)
     '''
-
+    # print("t_list = ", t_list)
+    # print ("t_list[0][2] = ", t_list[0][2])
+    # print ("t_list[0][1] = ", t_list[0][1])
     stepsize = t_list[0][2] - t_list[0][1]  # = 0.1 Computing the step-size from the sampled trajectories
     # print("\nComputed Step-size = ", stepsize)
 

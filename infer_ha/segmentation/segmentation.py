@@ -7,7 +7,7 @@ from sklearn import linear_model
 
 from infer_ha.utils.util_functions import rel_diff, matrowex
 
-def two_fold_segmentation(A, b1, b2, ytuple, Y, size_of_input_variables, method, ep_FwdBwd=0.01, ep_backward=0.1):
+def two_fold_segmentation(A, b1, b2, ytuple, Y, size_of_input_variables, method, stepM, ep_FwdBwd=0.01, ep_backward=0.1):
     """
     Main idea: (Step-1) We compare backward and forward derivatives at each point of the trajectories. Near the boundary
     of these points, their relative difference will be high. Now, we record these boundary points as the first set of
@@ -37,6 +37,7 @@ def two_fold_segmentation(A, b1, b2, ytuple, Y, size_of_input_variables, method,
     :param Y: contains the y_list values for all the points except the first and last M points.
     :param size_of_input_variables: total number of input variables present in the trajectories.
     :param method: clustering method selected by the user (options dtw, dbscan, etc.)
+    :param stepM: is the step size M in the Linear Multi-step Methods
     :param ep_FwdBwd: Maximal error toleration value. In the paper, \Epsilon_{FwdBwd}
     :return: The following
         segmented_traj: is a list of a custom data structure consisting of segmented trajectories (positions). Each item
@@ -90,14 +91,15 @@ def two_fold_segmentation(A, b1, b2, ytuple, Y, size_of_input_variables, method,
                     # print("pos:", high, "  diff-val:", diff_val)
                     break
             # I have here low and high but I want high to take some extra near the actual-boundary
-            near_high = high    # This is the boundary end-point
-            good_high = high # this will be improved
+            near_high = high - 1   # This is the boundary end-point. upto (high - 1) points lie in the current segment where as high hits the guard condition.
+            good_high = high - 1  # this will be improved
+            next_good_low = high  # this will be improved
             while high < max_id:  # moving high further to find the end of boundary point i.e., the next start-point.
 
                 diff_val = rel_diff(b1[high, size_of_input_variables:], b2[high, size_of_input_variables:]) # rel diff between backward and forward derivatives
 
-                relDiff_data_value = rel_diff(Y[high, size_of_input_variables:],
-                                Y[(high - 1), size_of_input_variables:]) # rel diff: current and previous data-values
+                # relDiff_data_value = rel_diff(Y[high, size_of_input_variables:],
+                #                 Y[(high - 1), size_of_input_variables:]) # rel diff: current and previous data-values
 
                 relDiff_backward = rel_diff(b1[high, size_of_input_variables:], b1[(high - 1),
                                 size_of_input_variables:])  # compute relative diff: current and previous
@@ -110,8 +112,10 @@ def two_fold_segmentation(A, b1, b2, ytuple, Y, size_of_input_variables, method,
                                 size_of_input_variables:])  # rel diff: current and next forward-derivatives
 
                 # print("high=", high, "  relDiff_Data =", relDiff_data_value, "  relDiff_Bwd=", relDiff_backward, "  relDiff_Fwd =", relDiff_forward)
+                # print("pos =", high, "  diff_val =", diff_val,  "  relDiff_Bwd=", relDiff_backward, "  relDiff_Fwd =", relDiff_forward)
                 if diff_val >= ep_FwdBwd:  # high difference.    This will detect and store all boundary points
-                    position_diffValue.append([high, relDiff_backward, relDiff_forward, relDiff_data_value]) # recording position and diff-value
+                    # position_diffValue.append([high, relDiff_backward, relDiff_forward, relDiff_data_value]) # recording position and diff-value
+                    position_diffValue.append([high, relDiff_backward, relDiff_forward])  # recording position and diff-value
                     high += 1
                 else:  # low difference so same segment
                     break
@@ -123,30 +127,29 @@ def two_fold_segmentation(A, b1, b2, ytuple, Y, size_of_input_variables, method,
                     value_position = position_diffValue[index][0]
                     value_relDiff_backward_derivative = position_diffValue[index][1]
                     value_relDiff_forward_derivative = position_diffValue[index][2]
-                    value_relDiff_data = position_diffValue[index][3]
+                    # value_relDiff_data = position_diffValue[index][3]
                     if (found_last_point == 0) and (value_relDiff_backward_derivative >= ep_backward): # found the exact change-point or the boundary point
                         good_high = value_position - 1  # the previous position is the last/end-point of the previous segment
+                        next_good_low = value_position  # the current position is the start-point for the next segment.
+                        break   # this will stop searching further
 
-                        next_good_low = value_position # the current position is the start-point for the next segment. This did not work for bouncing ball due to boundary crossing point changed abruptly
-                        if (value_relDiff_forward_derivative <= ep_FwdBwd):  # both <=ep_FwdBwd and <=ep_Fwd has some tasks: to consider data-points are in the same segment
-                            next_good_low = value_position # this is a good next segment's start-point
-                            break  # found both good_high and next_low so break for-loop
-                        else:
-                            found_last_point = 1
-                            continue    # search for next segment's start-point
-                    if (found_last_point == 1) and (value_relDiff_forward_derivative <= ep_FwdBwd): # found the last point but not the next start point
-                        next_good_low = value_position # this is a good next segment's start-point
+                    #     if (value_relDiff_forward_derivative <= ep_FwdBwd):  # both <=ep_FwdBwd and <=ep_Fwd has same task: to consider data-points are in the same segment
+                    #         next_good_low = value_position  # this is a good next segment's start-point
+                    #         break  # found both good_high and next_low so break for-loop
+                    #     else:
+                    #         found_last_point = 1
+                    #         continue    # search for next segment's start-point
+                    # if (found_last_point == 1) and (value_relDiff_forward_derivative <= ep_FwdBwd): # found the last point but not the next start point
+                    #     next_good_low = value_position # this is a good next segment's start-point
+                    #     break   # also found the next segment's start-point so break the for-loop
+                    #
 
-                        # Todo: to avoid dropping even a single point for assignment, we can check here if
-                        #   value_relDiff_backward_derivative is still >= ep_backward. if so then move or shift the
-                        #   "good_high" to this current position.
-                        #    if (value_relDiff_backward_derivative >= ep_backward):
-                        #       good_high = value_position - 1
-
-                        break   # also found the next segment's start-point so break the for-loop
                 # print("good_high=", good_high, "  next_good_low=", next_good_low, "  but near_low=", near_high)
+            else:  # what happens if boundary-point is also the exact point? This block will be executed
+                print("************ This block will be exectued only once. Since we have both the check  diff_val < ep_FwdBwd and diff_val >= ep_FwdBwd ************")
 
-            if good_high - good_low >= 5:    # when segment size is >= M points, where M is the step size of LMM
+            # if (good_high - good_low) >= stepM:   this is not safe
+            if (near_high - near_low) >= stepM:    # when segment size is >= M points, where M is the step size of LMM
                 segment_positions = list(range(good_low, good_high + 1)) # is a list holding the positions of the points. range(x,<y) goes upto < y.
                 segment = ([near_low, near_high], [good_low, good_high], segment_positions)
                 segmented_traj.append(segment)
@@ -271,6 +274,7 @@ def segmented_trajectories(clfs, segmented_traj, position, method, filter_last_s
 
             segments_per_traj = []
             traj_id += 1
+            # print("traj_id =", traj_id)
             seg = position[traj_id - 1]  # starting trajectory=0
             start_trajectory_pos = seg[0]
             end_trajectory_pos = seg[1]

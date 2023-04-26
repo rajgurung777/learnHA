@@ -6,7 +6,72 @@ import numpy as np
 
 from utils import generator as generate # generate_complete_polynomial
 
-def diff_method_backandfor(y_list, order, stepsize):
+
+def BDF_backward_version(stepM, stepsize, y_points, index):
+    """
+    Computes an approximate derivatives using backwards differentiation formula (BDF) derived from Linear Multi-step
+    Method (LMM) with the step size as M. This function computes the backward version of BDF.
+    @param stepM: The step size M of LMM
+    @param stepsize: step size between two data points
+    @param y_points: the actual data values of the trajectories
+    @param index: the position in the trajectory whose derivative is being approximated
+    @return:
+    """
+
+
+    if stepM == 2:
+        backward_derivative = (3 * y_points[index] - 4 * y_points[index - 1] + 1 * y_points[index - 2]) / (2 * stepsize)
+
+    if stepM == 3:
+        backward_derivative = (11 * y_points[index] - 18 * y_points[index - 1] + 9 * y_points[index - 2] - 2 * y_points[index - 3]) / (6 * stepsize)
+
+    if stepM == 4:
+        backward_derivative = (25 * y_points[index] - 48 * y_points[index - 1] + 36 * y_points[index - 2] - 16 * y_points[index - 3] + 3 * y_points[index - 4]) / (12 * stepsize)
+
+    if stepM == 5:
+        backward_derivative = (137 * y_points[index] - 300 * y_points[index - 1] + 300 * y_points[index - 2] - 200 *
+                           y_points[index - 3] + 75 * y_points[index - 4] - 12 * y_points[index - 5]) / (60 * stepsize)
+
+    if stepM == 6:
+        backward_derivative = (147 * y_points[index] - 360 * y_points[index - 1] + 450 * y_points[index - 2] - 400 *
+            y_points[index - 3] + 225 * y_points[index - 4] - 72 * y_points[index - 5] + 10 * y_points[index - 6]) / (60 * stepsize)
+
+    return backward_derivative
+
+
+def BDF_forward_version(stepM, stepsize, y_points, index):
+    """
+    Computes an approximate derivatives using backwards differentiation formula (BDF) derived from Linear Multi-step
+    Method (LMM) with the step size as M. This function computes the forward version of BDF.
+    @param stepM: The step size M of LMM
+    @param stepsize: step size between two data points
+    @param y_points: the actual data values of the trajectories
+    @param index: the position in the trajectory whose derivative is being approximated
+    @return:
+    """
+
+    if stepM == 2:
+        forward_derivative = (-3 * y_points[index] + 4 * y_points[index + 1] - 1 * y_points[index + 2]) / (2 * stepsize)
+
+    if stepM == 3:
+        forward_derivative = (-11 * y_points[index] + 18 * y_points[index + 1] - 9 * y_points[index + 2] + 2 * y_points[index + 3]) / (6 * stepsize)
+
+    if stepM == 4:
+        forward_derivative = (-25 * y_points[index] + 48 * y_points[index + 1] - 36 * y_points[index + 2] + 16 * y_points[index + 3] - 3 * y_points[index + 4]) / (12 * stepsize)
+
+    if stepM == 5:
+        forward_derivative = (-137 * y_points[index] + 300 * y_points[index + 1] - 300 * y_points[index + 2] + 200 * y_points[index + 3] - 75 * y_points[index + 4] + 12 * y_points[index + 5]) / (60 * stepsize)
+
+    if stepM == 6:
+        forward_derivative = (-147 * y_points[index] + 360 * y_points[index + 1] - 450 * y_points[index + 2] + 400 *
+                               y_points[index + 3] - 225 * y_points[index + 4] + 72 * y_points[index + 5] - 10 *
+                               y_points[index + 6]) / (60 * stepsize)
+
+    return forward_derivative
+
+
+
+def diff_method_backandfor(y_list, order, stepsize, stepM):
     """Using multi-step backwards differentiation formula (BDF) to calculate the
     coefficient matrix. We have concatenated all the trajectories into a single list because this helped us discard fewer data than
     considering trajectories as a list of independent trajectories. This is because, for the first M points (M the
@@ -24,6 +89,8 @@ def diff_method_backandfor(y_list, order, stepsize):
         order: is the degree of the polynomial of the flow equation (ODE).
     :param
         stepsize: is the sampling time period between two points.
+    :param
+        stepM: is the step size of Linear Multi-step Method (step M)
     :return:
         The following lists:
         final_A_mat: For every point of a trajectory the coefficients of the monomial terms obtained using the \Phi
@@ -40,6 +107,8 @@ def diff_method_backandfor(y_list, order, stepsize):
     final_y_mat = None
     ytuple = []
 
+    # stepM = 5   # the step size of Linear Multi-step Method (step M)
+
     # print("y_list=", y_list)   #This is the data from simulation except the time column
 
     L_y = y_list[0].shape[1]
@@ -52,12 +121,12 @@ def diff_method_backandfor(y_list, order, stepsize):
         y_points = y_list[k]
         L_t = len(y_points)
         # print("value of k =", k)
-        D = L_t - 5  # here M = order5      //Discarding the last M-points
+        D = L_t - stepM  # here M = order5      //Discarding the last M-points
         # print("Value of D = ", D) # D = total-points - 5
-        A_matrix = np.zeros((D - 5, L_p), dtype=np.double)  # stores the mapping function \Phi as in the paper
-        b1_matrix = np.zeros((D - 5, L_y), dtype=np.double)  # stores the backward_BDF using LMM as in the paper
-        b2_matrix = np.zeros((D - 5, L_y), dtype=np.double)  # stores the forward_BDF using LMM  as in the paper
-        y_matrix = np.zeros((D - 5, L_y), dtype=np.double)
+        A_matrix = np.zeros((D - stepM, L_p), dtype=np.double)  # stores the mapping function \Phi as in the paper
+        b1_matrix = np.zeros((D - stepM, L_y), dtype=np.double)  # stores the backward_BDF using LMM as in the paper
+        b2_matrix = np.zeros((D - stepM, L_y), dtype=np.double)  # stores the forward_BDF using LMM  as in the paper
+        y_matrix = np.zeros((D - stepM, L_y), dtype=np.double)
         coef_matrix = np.ones((L_t, L_p), dtype=np.double)  # stores the coefficient F as in the paper
         for i in range(0, L_t):
             for j in range(0, L_p):
@@ -65,15 +134,18 @@ def diff_method_backandfor(y_list, order, stepsize):
                     coef_matrix[i][j] = coef_matrix[i][j] * (y_points[i][l] ** gene[j][l])
         # For all the points i: For each variable, the mapping function \Phi is computed (monomials)
 
-        for i in range(5, D):      #//Discarding the first M-points
+        for i in range(stepM, D):      #//Discarding the first M-points
             # forward
-            A_matrix[i - 5] = coef_matrix[i]
-            b1_matrix[i - 5] = (137 * y_points[i] - 300 * y_points[i - 1] + 300 * y_points[i - 2] -
-                                200 * y_points[i - 3] + 75 * y_points[i - 4] - 12 * y_points[i - 5]) / (60 * stepsize)
+            A_matrix[i - stepM] = coef_matrix[i]
+            # b1_matrix[i - 5] = (137 * y_points[i] - 300 * y_points[i - 1] + 300 * y_points[i - 2] -
+            #                   200 * y_points[i - 3] + 75 * y_points[i - 4] - 12 * y_points[i - 5]) / (60 * stepsize)
+            b1_matrix[i - stepM] = BDF_backward_version(stepM, stepsize, y_points, i)
 
-            b2_matrix[i - 5] = (-137 * y_points[i] + 300 * y_points[i + 1] - 300 * y_points[i + 2] +
-                                200 * y_points[i + 3] - 75 * y_points[i + 4] + 12 * y_points[i + 5]) / (60 * stepsize)
-            y_matrix[i - 5] = y_points[i]
+            # b2_matrix[i - 5] = (-137 * y_points[i] + 300 * y_points[i + 1] - 300 * y_points[i + 2] +
+            #           200 * y_points[i + 3] - 75 * y_points[i + 4] + 12 * y_points[i + 5]) / (60 * stepsize)
+            b2_matrix[i - stepM] = BDF_forward_version(stepM, stepsize, y_points, i)
+
+            y_matrix[i - stepM] = y_points[i]
 
         # Finally, A_matrix now contain the monomial terms obtained using \Phi function
         # b1_matrix and b2_matrix contains the forward and backward BDF values using LMM. As in the paper Equation (10)
@@ -97,4 +169,5 @@ def diff_method_backandfor(y_list, order, stepsize):
             ytuple.append((l1, l2))
 
     return final_A_mat, final_b1_mat, final_b2_mat, final_y_mat, ytuple
+
 

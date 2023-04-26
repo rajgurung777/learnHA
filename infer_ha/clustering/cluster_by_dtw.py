@@ -16,7 +16,7 @@ from infer_ha.clustering.utils import get_signal_data, compute_correlation
 # from infer_ha.clustering.utils import  create_simple_modes_positions
 from infer_ha.clustering.utils import create_simple_modes_positions_for_ODE
 from infer_ha.utils.util_functions import matrowex
-
+from ..helpers.plotDebug import print_segmented_trajectories, print_P_modes
 
 
 def get_desired_clusters(P_modes, A, b1):
@@ -36,6 +36,9 @@ def get_desired_clusters(P_modes, A, b1):
         G: is a list containing the list of the coefficients of the polynomial ODE.
 
     """
+    # Debug ----------------
+    # print_P_modes(P_modes)
+    # ----------------
 
     # P = create_simple_modes_positions(P_modes)
     P = create_simple_modes_positions_for_ODE(P_modes)  # for ODE inference we use segment excluding boundary points
@@ -58,13 +61,17 @@ def get_desired_clusters(P_modes, A, b1):
         num_mode = len(length_and_modepts)
 
     for i in range(0, num_mode):  # Now since num_mode is assumed to be <= len(length_and_modepts), so first num_mode of data is considered as outputs
-        _, mode_ptsi = length_and_modepts[i]
+        datasize, mode_ptsi = length_and_modepts[i]
+        # print("i = ", i, "data size =", datasize)
         mode_pts.append(mode_ptsi)
     # Fit each cluster again
     clfs = []
     # print("Computing Linear Regression(ODE) for the combined Cluster")
     for i in range(num_mode):  # For this considered outputs coefficients are computed again
         clf = linear_model.LinearRegression(fit_intercept=False)
+        # print("x = ", matrowex(A, mode_pts[i]), "  y = ", matrowex(b1, mode_pts[i]))
+        # print("mode_pts = ", mode_pts[i])
+        # print("i =", i)
         clf.fit(matrowex(A, mode_pts[i]), matrowex(b1, mode_pts[i]))
         clfs.append(clf)
 
@@ -78,7 +85,7 @@ def get_desired_clusters(P_modes, A, b1):
     return G
 
 def cluster_by_dtw(segmented_traj, A, b1, Y, t_list, L_y, correl_threshold, distance_threshold,
-                   size_of_input_variables, maximum_ode_prune_factor=50):
+                   size_of_input_variables, stepM, maximum_ode_prune_factor=50):
     """
     This function contains our approach to clustering using the DTW algorithm.
 
@@ -111,7 +118,10 @@ def cluster_by_dtw(segmented_traj, A, b1, Y, t_list, L_y, correl_threshold, dist
             # and mode-1 = [ segment-1, ... , segment-n]
             # and segment-1 = ([start_ode, end_ode], [start_exact, end_exact], [p1, ..., p_n])
     # *******************************************************************************************
-    f_ode, t_ode = get_signal_data(segmented_traj, Y, L_y, t_list, size_of_input_variables)  # get the segmented signal from trajectory.
+    # f_ode, t_ode = get_signal_data(segmented_traj, Y, L_y, t_list, size_of_input_variables, stepM)  # get the segmented signal from trajectory.
+    f_ode, t_ode = get_signal_data(segmented_traj, Y, b1, L_y, t_list, size_of_input_variables,
+                                   stepM)  # get the segmented signal from trajectory.
+
     #Now, f_ode is the derivatives of the segmented data-points
     # print("f_ode is ", f_ode)
     # *******************************************************************************************
@@ -131,13 +141,19 @@ def cluster_by_dtw(segmented_traj, A, b1, Y, t_list, L_y, correl_threshold, dist
     count = len(res)
 
     # P.append(res[0]) # stores the first segment
-
+    #  ********* Debugging ***********
+    # file_csv = open('clusterProcessFile.csv','w')
+    # writer = csv.writer(file_csv)   # file pointer created
+    # rowValue = ["i", "j", "Seg_i: time-start", "time-end", "Seg_j: time-start", "time-end", "distance", "correlation", "Cluster-ID"]
+    # writer.writerow(rowValue)
+    # ***************************************
     f_ode1 = f_ode
     t_ode1 = t_ode  # t_ode is used only for plotting for debugging
     res1 = res    # makes a copy of the segmented_traj for working
     res2 = res1
     i = 0    # j = 0
     flag = 0
+    myClusterCount = 0
     while (i < count):
         j = i + 1
         mode = [res1[i]]  # to hold list of segments per mode; initialize the first segmented_traj
@@ -161,11 +177,20 @@ def cluster_by_dtw(segmented_traj, A, b1, Y, t_list, L_y, correl_threshold, dist
                 min_correl = correlValue
             if correlValue > max_correl:
                 max_correl = correlValue
+            length_seg_i = len(t_ode[i]) - 1
+            length_seg_j = len(t_ode[j]) - 1
 
-            # print("i=", i, " and j=",j , " :  distance1 = ", distance1, " :  distance = ", distance, "   and   correlation = ", correlValue)
+
+            # Debugging ******************
+            # rowValue = [i, j, t_ode[i][0], t_ode[i][length_seg_i], t_ode[j][0], t_ode[j][length_seg_j], distance, correlValue, myClusterCount]
+            # writer.writerow(rowValue)
+            # if (correlValue > correl_threshold):
+            #   print("i=", i, " and j=", j, " :  distance1 = ", distance1, " :  distance = ", distance, "   and   correlation = ", correlValue)
 
             # if (i==0 and j>=7 and j<=8):
             # plotdebug.plot_signals(t_ode[i], f_ode[i], t_ode[j], f_ode[j])
+            # Debugging ******************
+
 
             if correlValue >= correl_threshold and distance_threshold == 0:  # distance_threshold is disabled or ignored
                 print("******************************************** Found *******************************")
@@ -173,7 +198,7 @@ def cluster_by_dtw(segmented_traj, A, b1, Y, t_list, L_y, correl_threshold, dist
                 performance_prune_count += 1
                 if performance_prune_count <= maximum_ode_prune_factor:  # Just this line helps in pruning same segments for performance of ODE computaion
                     # P[inx].extend(res1[j])      # //pushing in the same cluster i for the first 50 segments
-                    # print("performance_prune_count=", performance_prune_count)
+                    print("performance_prune_count=", performance_prune_count)
                     mode.append(res1[j])
 
                 delete_position.append(j)
@@ -205,6 +230,7 @@ def cluster_by_dtw(segmented_traj, A, b1, Y, t_list, L_y, correl_threshold, dist
         t_ode = t_ode1
         res1 = res2
         i = i + 1  # reset for next cluster
+        myClusterCount += 1
         performance_prune_count = 0  # reset for next cluster
 
     # print("len(P) = ", len(P))

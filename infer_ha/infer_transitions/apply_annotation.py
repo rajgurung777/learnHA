@@ -23,6 +23,11 @@ def apply_annotation(Y, variableType_datastruct, list_connection_pt, assignment_
         1) set all coefficient with index i, to 0
         2) set the intercept value to pv for index i
 
+    type 't3' (constant assignment or the jump reset assignment)
+        1) set all coefficient with index i, to 0
+        2) set the intercept value to the constant value for index i
+
+
     """
 
     # print(variableType_datastruct)
@@ -33,7 +38,6 @@ def apply_annotation(Y, variableType_datastruct, list_connection_pt, assignment_
         var_type = var_type_detail[2]
         # print("Annotation Section: var_index=", var_index, "   var_type=", var_type)
         if var_type == "t1":
-
             for coeff_index in range(len(assignment_coeff[var_index])):
                 # print(" yes inside t1, var_index=", var_index, "   coeff_index=", coeff_index)
                 if var_index == coeff_index:
@@ -63,7 +67,11 @@ def apply_annotation(Y, variableType_datastruct, list_connection_pt, assignment_
             assignment_intercept[var_index] = pool_values[max_count_index]
 
         elif var_type == "t3":
-            print("we do not learn for type t3 variable")
+            constant_value = var_type_detail[4]
+            for coeff_index in range(len(assignment_coeff[var_index])):
+                # print(" yes inside t3, var_index=", var_index, "   coeff_index=", coeff_index)
+                assignment_coeff[var_index][coeff_index] = 0
+            assignment_intercept[var_index] = constant_value
 
         elif var_type == "t4":
             print("Suggest to consider type t4 as t2 if values are known. Otherwise linear regression is performed")

@@ -81,3 +81,8 @@ def multinomial(vars, powers):
     return combine_list
 
 
+if __name__ == "__main__":
+    dim = 3+1
+    degree = 2
+    combine_list = multinomial(dim,degree)
+    print(combine_list)

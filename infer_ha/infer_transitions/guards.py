@@ -96,10 +96,10 @@ def getGuard_inequality(srcData, destData, L_y, boundary_order, Y):
         if relative_difference <= 0.0001:
             count_small_rel_diff +=1
     # **********
-    print("Total data with small relative difference =", count_small_rel_diff)
+    # print("Total data with small relative difference =", count_small_rel_diff)
     # if relative_difference <= 0.0000001:  #increasing the original analysed value 0.0001
     if relative_difference <= 0.0001:  #increasing the original analysed value 0.0001
-        print("********** ********** we found small relative difference =", relative_difference, " ********** **********")
+        print("******* we found ", count_small_rel_diff,  "  small relative difference =", relative_difference, " *****")
         c_value = 1
         skipGridSearch = True   # Also skip grid search as this will also give problem for grid search
 
@@ -151,8 +151,9 @@ def getGuard_inequality(srcData, destData, L_y, boundary_order, Y):
     p_label, p_acc, p_val = svm_predict(y, x, m, '-q')
     print('Accuracy is ', p_acc[0])
 
-    guard_coeff = inverse_scale(guard_coeff, scale_param, L_y)
+    guard_coeff = inverse_scale(guard_coeff, scale_param, L_y, boundary_order)
 
+    # print("guard_coeff after inverse_scale is ", guard_coeff)
     return guard_coeff
 
 

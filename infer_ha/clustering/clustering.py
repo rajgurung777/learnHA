@@ -12,7 +12,7 @@ The learning algorithm is currently designed by focusing on the DTW algorithm.
 from infer_ha.clustering.cluster_by_dtw import cluster_by_dtw
 from infer_ha.clustering.cluster_by_others import dbscan_cluster, merge_cluster_tol2
 
-def select_clustering(segmented_traj, A, b1, clfs, Y, t_list, L_y, learning_parameters):
+def select_clustering(segmented_traj, A, b1, clfs, Y, t_list, L_y, learning_parameters, stepM):
     """
     A wrapper module that enables the selection of different approaches to the clustering algorithm.
 
@@ -70,7 +70,7 @@ def select_clustering(segmented_traj, A, b1, clfs, Y, t_list, L_y, learning_para
     if method == "dtw":
         print("Running clustering using  DTW algorithm!!")
         P_modes, G = cluster_by_dtw(segmented_traj, A, b1, Y, t_list, L_y, correl_threshold,
-                              distance_threshold, size_of_input_variables, maximum_ode_prune_factor) # t_list only used for debugging using plot
+                              distance_threshold, size_of_input_variables, stepM, maximum_ode_prune_factor) # t_list only used for debugging using plot
         print("Total Clusters after DTW algorithm = ", len(P_modes))
 
     return P_modes, G

@@ -5,7 +5,8 @@ This is the main module for inferring an HA model.
 
 import sys  # This is used for command line arguments
 
-from infer_ha.helpers.plotDebug import plot_data_values, output_derivatives, plot_segmentation_new
+from infer_ha.helpers.plotDebug import plot_data_values, output_derivatives, plot_segmentation_new, \
+    plot_after_clustering, print_segmented_trajectories, analyse_output
 # from infer_ha.segmentation.segmentation import two_fold_segmentation_new, segmented_trajectories
 from infer_ha.segmentation.segmentation import two_fold_segmentation, segmented_trajectories
 
@@ -68,20 +69,20 @@ def infer_model(list_of_trajectories, learning_parameters):
     isInvariant = learning_parameters['is_invariant']
 
     methods = learning_parameters['methods']
-
-
+    stepM = learning_parameters['lmm_step_size'] # 2 for engine-timing  #  the step size of Linear Multi-step Method (step M)
+    print("stepM =", stepM)
     mode_inv = []
     transitions = []
 
     t_list, y_list, position = preprocess_trajectories(list_of_trajectories)
     # print("position = ", position)
     # Apply Linear Multistep Method
-    A, b1, b2, Y, ytuple = diff_method_backandfor(y_list, maxorder, stepsize)   # compute forward and backward version of BDF
+    A, b1, b2, Y, ytuple = diff_method_backandfor(y_list, maxorder, stepsize, stepM)   # compute forward and backward version of BDF
     num_pt = Y.shape[0]
     # print("Initial computation done!")
 
     # ********* Debugging ***********************
-    output_derivatives(b1, b2, Y, size_of_input_variables)
+    # output_derivatives(b1, b2, Y, size_of_input_variables)
     # ********* Debugging ***********************
 
     print("ytuple is = ", ytuple)
@@ -90,8 +91,18 @@ def infer_model(list_of_trajectories, learning_parameters):
     # res, drop, clfs = segment_and_fit(A, b1, b2, ytuple,ep) #Amit: uses the simple relative-difference between forward and backward BDF presented in the paper, Algorithm-1.
     # res, drop, clfs, res_modified = segment_and_fit_Modified_two(A, b1, b2, ytuple,ep)
     # res, drop, clfs, res_modified = two_fold_segmentation_new(A, b1, b2, ytuple, size_of_input_variables, methods, ep)
-    segmented_traj, clfs, drop = two_fold_segmentation(A, b1, b2, ytuple, Y, size_of_input_variables, methods, ep, ep_backward)
+    segmented_traj, clfs, drop = two_fold_segmentation(A, b1, b2, ytuple, Y, size_of_input_variables, methods, stepM, ep, ep_backward)
     print("Number of segments =", len(segmented_traj))
+    L_y = len(y_list[0][0])  # Number of dimensions
+
+    # analyse_variable_index = 2  # zero-based indexing. 0 for refrigeration-cycle. and 2 for engine-timing-system
+
+    # analyse_output(segmented_traj, b1, b2, Y, t_list, L_y, size_of_input_variables, stepM, analyse_variable_index)
+
+    # ********* Plotting/Visualizing various points for debugging *************************
+    # plot_segmentation_new(segmented_traj, L_y, t_list, Y, stepM) # Trying to verify the segmentation for each segmented points
+    # print_segmented_trajectories(segmented_traj)
+    # print("position = ", position)
 
     # print("Y = ", Y)
     print("len of drop = ", len(drop))
@@ -103,20 +114,17 @@ def infer_model(list_of_trajectories, learning_parameters):
     # print("filter_last_segment", filter_last_segment)
     segmentedTrajectories, segmented_traj, clfs = segmented_trajectories(clfs, segmented_traj, position, methods, filter_last_segment) # deleted the last segment in each trajectory
     print("Segmentation done!")
-    L_y = len(y_list[0][0])  # Number of dimensions
-
     # print("segmentedTrajectories = ", segmentedTrajectories)
     # plot_data_values(segmentedTrajectories, Y, L_y)
     # print()
-
     # ********* Plotting/Visualizing various points for debugging *************************
-    # plotdebug.plot_guard_points(segmentedTrajectories, L_y, t_list, Y) # pre-end and end points of each segment
-    # plotdebug.plot_reset_points(segmentedTrajectories_modified, L_y, t_list, Y) # plotting Reset or Start points
-    # plotdebug.plot_segmentation(res, L_y, t_list, Y) # Trying to verify the segmentation for each segmented points
-    # plot_segmentation_new(segmented_traj, L_y, t_list, Y) # Trying to verify the segmentation for each segmented points
+    # plotdebug.plot_guard_points(segmentedTrajectories, L_y, t_list, Y, stepM) # pre-end and end points of each segment
+    # plotdebug.plot_reset_points(segmentedTrajectories_modified, L_y, t_list, Y, stepM) # plotting Reset or Start points
+    # plotdebug.plot_segmentation(res, L_y, t_list, Y, stepM) # Trying to verify the segmentation for each segmented points
+    # plot_segmentation_new(segmented_traj, L_y, t_list, Y, stepM) # Trying to verify the segmentation for each segmented points
 
     number_of_segments_before_cluster = len(segmented_traj)
-    P_modes, G = select_clustering(segmented_traj, A, b1, clfs, Y, t_list, L_y, learning_parameters) # when len(res) < 2 compute P and G for the single mode
+    P_modes, G = select_clustering(segmented_traj, A, b1, clfs, Y, t_list, L_y, learning_parameters, stepM) # when len(res) < 2 compute P and G for the single mode
     # print("Fixing Dropped points ...") # I dont need to fix
     # P, Drop = dropclass(P, G, drop, A, b1, Y, ep, stepsize)  # appends the dropped point to a cluster that fits well
     # print("Total dropped points (after fixing) are: ", len(Drop))
@@ -125,7 +133,7 @@ def infer_model(list_of_trajectories, learning_parameters):
 
     # *************** Trying to plot points ***********************************
     # plotdebug.plot_dropped_points(t_list, L_y, Y, Drop)
-    # plotdebug.plot_after_clustering(t_list, L_y, P, Y)
+    # plot_after_clustering(t_list, L_y, P_modes, Y, stepM)
     mode_inv = compute_mode_invariant(L_y, P_modes, Y, isInvariant)
     # *************** Trying to plot the clustered points ***********************************
     # print("Number of num_mode= ", num_mode)

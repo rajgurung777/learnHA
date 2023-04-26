@@ -39,10 +39,12 @@ def read_commandline_arguments():
                         type=int, default=2, required=False)
     parser.add_argument('--size-input-variable', help='Number of input variables in the trajectories', type=int, required=True)
     parser.add_argument('--size-output-variable', help='Number of output variables in the trajectories', type=int, required=True)
-    parser.add_argument('--variable-types', help='Type Annotation for variables. Options are t1: continuous variables'
-                        ' t2: constant pool of values. Syntax: --variable-types "x0=t1, x1=t2, x2=t1"',
+    parser.add_argument('--variable-types', help='Type Annotation for variables. Options are t1: continuous variables, '
+                        ' t2: constant pool of values, t3: constant assignment. Syntax: --variable-types "x0=t1, x1=t2, x2=t3"',
                         type=str, default='', required=False)
     parser.add_argument('--pool-values', help='set the values of type=t2. Syntax: --pool-values "x1={10, 20, 30, 40}"',
+                        type=str, default='', required=False)
+    parser.add_argument('--constant-value', help='set the reset value of type=t3. Syntax: --constant-value "x1=0 & x2=47.7"',
                         type=str, default='', required=False)
     parser.add_argument('--ode-speedup', help='Maximum number of segments to include for ODE computation. Set to 10 by default',
                         type=int, default=10, required=False)
@@ -53,7 +55,9 @@ def read_commandline_arguments():
     parser.add_argument('--filter-last-segment',
                         help='1 to enable and 0 to disable (default) filtering out the last segment from a trajectory during segmentation', type=int,
                         choices=[0,1], default=0, required=False)
-
+    parser.add_argument('--lmm-step-size',
+                        help='Options are: 2/3/4/5/6. Higher values computes more accurate derivatives. 5 is set default',
+                        type=int, choices=[2, 3, 4, 5, 6], default=5, required=False)
 
     args = vars(parser.parse_args())    #  create a dict structure of the arguments
     # note the key name replaces with '_' for all '-' in the arguments
@@ -76,6 +80,8 @@ def read_commandline_arguments():
     print("ode_speedup =", args['ode_speedup'])
     print("is_invariant =", args['is_invariant'])
     print("stepsize =", args['stepsize'])
+    print("filter-last-segment =", args['filter_last_segment'])
+    print("lmm-step-size =", args['lmm_step_size'])
     
     '''
 
@@ -109,11 +115,13 @@ def process_type_annotation_parameters(parameters, system_dim):
     # ******** Parsing the command line argument variable-type and pool-values into a list *****************
     variable_types = parameters['variable_types'] # Eg.: "x0=t4, x1=t3, x2=t4, x3=t1, x4=t2"
     pool_values = parameters['pool_values']   # Eg.:  "x2={10,20,30,40} & x4={14.7,12.5}"
+    constant_value = parameters['constant_value']  # Eg.:  "x1=47.7 & others"; x1 is t3 type variable and jump reset is 47.7
     # ******** ******** ******** ******** ******** ******** ******** ******** ********
-    variableType_datastruct = []  # structure that holds [var_index, var_name, var_type, pool_values]
-    for i in range(0, system_dim):  # create and initialize the datastruct
-        variableType_datastruct.append([i, "x" + str(i), "", ""])
-    # print ("data = ", variableType_datastruct)
+    variableType_datastruct = []  # structure that holds [var_index, var_name, var_type, pool_values, constant_value]
+    # Note the structure of the data structure "variableType_datastruct" defined above
+    for i in range(0, system_dim):  # create and initialize the datastruct. Here we assume variable to hold names "x0","x1", etc.
+        variableType_datastruct.append([i, "x" + str(i), "", "", ""])
+    print ("data = ", variableType_datastruct)
     # print("v_type:",variable_types, "and pool_val:",pool_values,"end")
     # print("Length of v_type:",len(variable_types), "and Length of pool_val:",len(pool_values),"end")
 
@@ -137,20 +145,34 @@ def process_type_annotation_parameters(parameters, system_dim):
     if len(pool_values) >= 1:  # parse only when values are supplied from command line
         str_pool_values = pool_values.split(" & ")  # Eg.:  "x2={10,20,30,40} & x4={14.7,12.5}"
         # print("Pool values:", str_pool_values)
-        for i in str_pool_values:  # Eg.:  "x2={10,20,30,40}"
-            str_i_values = i.split("=")  # Eg.:  "['x2', '{10,20,30,40}']"
-            varName = str_i_values[0]
-            varValues = str_i_values[1]  # Eg.:  '{10,20,30,40}'
+        for poolValue in str_pool_values:  # Eg.:  "x2={10,20,30,40}"
+            str_poolValue_values = poolValue.split("=")  # Eg.:  "['x2', '{10,20,30,40}']"
+            varName = str_poolValue_values[0]
+            varValues = str_poolValue_values[1]  # Eg.:  '{10,20,30,40}'
             size = len(varValues)
-            varValues = varValues[1:size - 1]
+            varValues = varValues[1:size - 1]   # discarding parenthesis { and }
             # print("Var Name: ", varName, " var Values: ", varValues)
-            varValues = [float(x) for x in varValues.split(",")]
+            varValues = [float(x) for x in varValues.split(",")] # created a list of the pool of values
             for val in variableType_datastruct:
                 if varName in val:
                     index = val[0]
                     variableType_datastruct[index][3] = varValues
 
-    # print ("data again = ", variableType_datastruct)
+
+    if len(constant_value) >= 1:  # parse only when values are supplied from command line
+        str_const_value = constant_value.split(" & ")  # Eg.:  "x1=0 & x2=14.7"
+        # print("Constant value:", str_const_value)
+        for constValue in str_const_value:  # Eg.:  "x1=0"
+            str_const_each_element = constValue.split("=")  # Eg.:  "['x1', '0']"
+            varName = str_const_each_element[0]  # Eg.:  'x1'
+            varValue = str_const_each_element[1]  # Eg.:  '0'
+            for val in variableType_datastruct:
+                if varName in val:
+                    index = val[0]
+                    variableType_datastruct[index][4] = varValue
+
+
+    print ("Data structure populated = ", variableType_datastruct)
 
     '''
     See the example output after parsing variable_types ="x0=t4, x1=t3, x2=t2, x3=t1, x4=t2" and pool_values="x2={10,20,30,40} & x4={14.7,12.5}"

@@ -58,7 +58,7 @@ def create_connecting_points(P_modes, position, segmentedTrajectories):
                             data_points_per_trans.append([pre_end_posi, end_posi, start_posi])
             if len(data_points_per_trans) > 0:
                 data_points.append([i, j, data_points_per_trans])
-                print("[src, dest, total-points] = [", i, " , ", j, " , ", len(data_points_per_trans), "]")
+                # print("[src, dest, total-points] = [", i, " , ", j, " , ", len(data_points_per_trans), "]")
 
             # Code for Backward-Transitions
             if i != j:  # loop is to be done only one
@@ -79,7 +79,7 @@ def create_connecting_points(P_modes, position, segmentedTrajectories):
                                 data_points_per_trans.append([pre_end_posi, end_posi, start_posi])
                 if len(data_points_per_trans) > 0:
                     data_points.append([j, i, data_points_per_trans])
-                    print("[src, dest, total-points] = [", j, " , ", i, " , ", len(data_points_per_trans), "]")
+                    # print("[src, dest, total-points] = [", j, " , ", i, " , ", len(data_points_per_trans), "]")
     # print("\nLength of data points = ", len(data_points))
     # print("data points are ", data_points)
     return data_points

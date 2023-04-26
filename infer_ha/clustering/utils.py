@@ -1,7 +1,7 @@
 
 import numpy as np
 
-def get_signal_data(segmented_traj, Y, L_y, t_list, size_of_input_variables):
+def get_signal_data(segmented_traj, Y, b1, L_y, t_list, size_of_input_variables, stepM):
     """
     This is a pre-processing function to obtain the actual signal points of the segmented trajectories.
 
@@ -36,7 +36,7 @@ def get_signal_data(segmented_traj, Y, L_y, t_list, size_of_input_variables):
             signalData.append([Y[pos_id, dim] for dim in range(size_of_input_variables, L_y)])  # ignore input-variables. * Y contain the actual data-points
             # signalData.append([b1[pos_id, dim] for dim in range(size_of_input_variables, L_y)])  # ignore input-variables. * b1 contain the backward derivatives
 
-            time_data.append(t_list[0][pos_id + 5])  # since Y values are after leaving 5 point from start and -5 at the end
+            time_data.append(t_list[0][pos_id + stepM])  # since Y values are after leaving 5 point from start and -5 at the end
         f_ode.append(signalData)
         t_ode.append(time_data)  # computing time only for plotting reason
 
