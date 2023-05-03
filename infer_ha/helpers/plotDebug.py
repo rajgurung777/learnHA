@@ -230,17 +230,17 @@ def plot_segmentation_new(segmented_traj, L_y, t_list, Y, stepM):
             x_pts.append({dim + 1: Y[id0, dim] for dim in range(L_y)})
             time_pt.append(t_list[0][id0 + stepM])  # since Y values are after leaving 5 point from start and -5 at the end
 
-        # x_p1 = list(map(itemgetter(1), x_pts))
+        x_p1 = list(map(itemgetter(1), x_pts))
         # x_p2 = list(map(itemgetter(2), x_pts))
-        x_p3 = list(map(itemgetter(3), x_pts))
+        # x_p3 = list(map(itemgetter(3), x_pts))
         # x_p4 = list(map(itemgetter(4), x_pts))
         # x_p5 = list(map(itemgetter(5), x_pts))
 
         plt.figure(2)
         plt.title('Segmentation')
-        # plt.scatter(time_pt, x_p1)  # padel_angle    refrigeration-cycle
+        plt.scatter(time_pt, x_p1)  # padel_angle    refrigeration-cycle
         # plt.scatter(time_pt, x_p2) # engine-speed
-        plt.scatter(time_pt, x_p3) #engine-speed
+        # plt.scatter(time_pt, x_p3) #engine-speed
         # plt.scatter(time_pt, x_p4) # AF the value of our interest
         # plt.scatter(time_pt, x_p5) # controller_mode for AT speed
         # plt.xlim([0, 3])    #Navigation
@@ -251,11 +251,11 @@ def plot_segmentation_new(segmented_traj, L_y, t_list, Y, stepM):
         # plt.xlim([0, 50])   #AFC
         # plt.ylim([14.5, 15.5])   #AFC for x_p4 the AF variable
 
-        plt.xlim([0, 10])  # Two Tanks      plt.scatter(x_p3)
-        plt.ylim([-1, 2])  # Two Tanks
+        # plt.xlim([0, 10])  # Two Tanks      plt.scatter(x_p3)
+        # plt.ylim([-1, 2])  # Two Tanks
 
-        # plt.xlim([0, 3000])  # refrigeration cycle
-        # plt.ylim([274, 280])  # refrigeration cycle
+        plt.xlim([0, 3000])  # refrigeration cycle
+        plt.ylim([274, 280])  # refrigeration cycle
 
         #
         # plt.xlim([0, 10])  # Engine Timing System      plt.scatter(x_p3)
@@ -384,17 +384,17 @@ def plot_after_clustering(t_list, L_y, P_modes, Y, stepM):
             x_pts.append({dim + 1: Y[id0, dim] for dim in range(L_y)})
             time_pt.append(t_list[0][id0 + stepM])   #since Y values are after leaving 5 point from start and -5 at the end
 
-        # x_p1 = list(map(itemgetter(1), x_pts))
+        x_p1 = list(map(itemgetter(1), x_pts))
         # x_p2 = list(map(itemgetter(2), x_pts))
-        x_p3 = list(map(itemgetter(3), x_pts))
+        # x_p3 = list(map(itemgetter(3), x_pts))
         # x_p4 = list(map(itemgetter(4), x_pts))
         # x_p5 = list(map(itemgetter(5), x_pts))
         plt.figure(3)
         plt.title('Segment(s) After Clustering')
-        # ax.scatter(time_pt, x_p1)  # padel_angle  refrigeration-cycle
+        plt.scatter(time_pt, x_p1)  # padel_angle  refrigeration-cycle
         # plt.scatter(time_pt, x_p2) # engine-speed
         # ax.scatter(time_pt, x_p2) # engine-speed
-        plt.scatter(time_pt, x_p3) # for chasing cars
+        # plt.scatter(time_pt, x_p3) # for chasing cars
         # ax.scatter(time_pt, x_p3) # engine-speed
         # plt.scatter(time_pt, x_p4) # AF the value of our interest
         # plt.scatter(time_pt, x_p5)  # controller_mode
@@ -409,8 +409,8 @@ def plot_after_clustering(t_list, L_y, P_modes, Y, stepM):
         # plt.xlim([0, 50])   #AFC
         # plt.ylim([10, 17])   #AFC for x_p4 the AF variable
 
-        # plt.xlim([0, 3000])  # refrigeration cycle
-        # plt.ylim([274, 280])  # refrigeration cycle
+        plt.xlim([0, 3000])  # refrigeration cycle
+        plt.ylim([274, 280])  # refrigeration cycle
 
         # plt.xlim([0, 10])  # Engine Timing System      plt.scatter(x_p3)
         # plt.ylim([1900, 3500])  # Engine Timing System
@@ -427,8 +427,8 @@ def plot_after_clustering(t_list, L_y, P_modes, Y, stepM):
         # plt.ylim([-1, 1])  # Oscillator
         # plt.xlim([0, 100])  # chasing cars
         # plt.ylim([-500, 100])  # chasing cars
-        plt.xlim([-0.1, 10])  # Two-tanks x1, liquid in tank-1
-        plt.ylim([-1.2, 2.5])  # Two-tanks x1, liquid in tank-1
+        # plt.xlim([-0.1, 10])  # Two-tanks x1, liquid in tank-1
+        # plt.ylim([-1.2, 2.5])  # Two-tanks x1, liquid in tank-1
 
         # plt.xlim([0, 10])  # Two Tanks      plt.scatter(x_p3)
         # plt.ylim([-1, 2])  # Two Tanks

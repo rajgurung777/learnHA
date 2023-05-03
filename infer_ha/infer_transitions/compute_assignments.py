@@ -30,7 +30,7 @@ def compute_assignments(list_connection_pt, L_y, Y):
     # lin_reg = linear_model.LinearRegression(fit_intercept=False)  # without intercepts
     lin_reg = linear_model.LinearRegression()  # with intercepts
     lin_reg = lin_reg.fit(x_pts, y_pts)
-    print("Linear Regression Score = ", lin_reg.score(x_pts, y_pts))
+    # print("Linear Regression Score = ", lin_reg.score(x_pts, y_pts))
     assign_coeff = lin_reg.coef_
     assign_intercept = lin_reg.intercept_
     # print("Now reg.intercept_")

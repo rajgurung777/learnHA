@@ -99,7 +99,7 @@ def getGuard_inequality(srcData, destData, L_y, boundary_order, Y):
     # print("Total data with small relative difference =", count_small_rel_diff)
     # if relative_difference <= 0.0000001:  #increasing the original analysed value 0.0001
     if relative_difference <= 0.0001:  #increasing the original analysed value 0.0001
-        print("******* we found ", count_small_rel_diff,  "  small relative difference =", relative_difference, " *****")
+        # print("******* we found ", count_small_rel_diff,  "  small relative difference =", relative_difference, " *****")
         c_value = 1
         skipGridSearch = True   # Also skip grid search as this will also give problem for grid search
 
@@ -138,8 +138,8 @@ def getGuard_inequality(srcData, destData, L_y, boundary_order, Y):
 
         endTime = time.time()   # recording the current time also replaces the previous value
         searchTime = endTime - startTime
-        print ("  C=", c_value_optimal, ", Gamma=",gamma_value_optimal, ", coef0=",coef_optimal)
-        print ("Search Time (secs): ", searchTime)
+        # print ("  C=", c_value_optimal, ", Gamma=",gamma_value_optimal, ", coef0=",coef_optimal)
+        # print ("Search Time (secs): ", searchTime)
     #  ********** End of Grid Search for hyperparameter tuning ************
 
     m = svm_model_training(x, y, boundary_order, c_value_optimal, coef_optimal, gamma_value_optimal)
@@ -149,7 +149,7 @@ def getGuard_inequality(srcData, destData, L_y, boundary_order, Y):
 
     # print("guard_coeff is ", guard_coeff)
     p_label, p_acc, p_val = svm_predict(y, x, m, '-q')
-    print('Accuracy is ', p_acc[0])
+    # print('Accuracy is ', p_acc[0])
 
     guard_coeff = inverse_scale(guard_coeff, scale_param, L_y, boundary_order)
 

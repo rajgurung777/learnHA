@@ -28,7 +28,7 @@ def runLearnHA():  # Calling the implementation from project BBC4CPS
     else:
         step_size = default_user_stepsize  # user provided some step-size
 
-    print("stepsize = ", step_size)
+    # print("stepsize = ", step_size)
     # stepsize = 0.01
     # print("list of trajectories is ",list_of_trajectories)
     variableType_datastruct = []  # structure that holds [var_index, var_name, var_type, pool_values]
@@ -49,7 +49,7 @@ def runLearnHA():  # Calling the implementation from project BBC4CPS
     end = time.time()
     total_learning_time = end - start
     # print("******************* How is this happening *******************")
-    print("inferring_time = ", total_learning_time)
+    # print("inferring_time = ", total_learning_time)
     # print("Number of modes chosen =", num_mode)
     # print("Number of modes learned = ", len(P_modes))
 

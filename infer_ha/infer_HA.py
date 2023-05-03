@@ -70,7 +70,7 @@ def infer_model(list_of_trajectories, learning_parameters):
 
     methods = learning_parameters['methods']
     stepM = learning_parameters['lmm_step_size'] # 2 for engine-timing  #  the step size of Linear Multi-step Method (step M)
-    print("stepM =", stepM)
+    # print("stepM =", stepM)
     mode_inv = []
     transitions = []
 
@@ -85,14 +85,14 @@ def infer_model(list_of_trajectories, learning_parameters):
     # output_derivatives(b1, b2, Y, size_of_input_variables)
     # ********* Debugging ***********************
 
-    print("ytuple is = ", ytuple)
+    # print("ytuple is = ", ytuple)
     # print("A length=", A.shape)
     # Segment and fit
     # res, drop, clfs = segment_and_fit(A, b1, b2, ytuple,ep) #Amit: uses the simple relative-difference between forward and backward BDF presented in the paper, Algorithm-1.
     # res, drop, clfs, res_modified = segment_and_fit_Modified_two(A, b1, b2, ytuple,ep)
     # res, drop, clfs, res_modified = two_fold_segmentation_new(A, b1, b2, ytuple, size_of_input_variables, methods, ep)
     segmented_traj, clfs, drop = two_fold_segmentation(A, b1, b2, ytuple, Y, size_of_input_variables, methods, stepM, ep, ep_backward)
-    print("Number of segments =", len(segmented_traj))
+    # print("Number of segments =", len(segmented_traj))
     L_y = len(y_list[0][0])  # Number of dimensions
 
     # analyse_variable_index = 2  # zero-based indexing. 0 for refrigeration-cycle. and 2 for engine-timing-system
@@ -105,7 +105,7 @@ def infer_model(list_of_trajectories, learning_parameters):
     # print("position = ", position)
 
     # print("Y = ", Y)
-    print("len of drop = ", len(drop))
+    # print("len of drop = ", len(drop))
     # print("segmented_traj = ", segmented_traj)
     # print("clfs size = ", len(clfs))
 
@@ -113,7 +113,7 @@ def infer_model(list_of_trajectories, learning_parameters):
     filter_last_segment = learning_parameters['filter_last_segment']  # 1 for delete last segment and 0 NOT to delete
     # print("filter_last_segment", filter_last_segment)
     segmentedTrajectories, segmented_traj, clfs = segmented_trajectories(clfs, segmented_traj, position, methods, filter_last_segment) # deleted the last segment in each trajectory
-    print("Segmentation done!")
+    # print("Segmentation done!")
     # print("segmentedTrajectories = ", segmentedTrajectories)
     # plot_data_values(segmentedTrajectories, Y, L_y)
     # print()

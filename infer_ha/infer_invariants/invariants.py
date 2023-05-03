@@ -28,11 +28,11 @@ def compute_mode_invariant(L_y, P_modes, Y, invariant_enabled):
 
     # 0 and 1: enabled 2: disabled
     mode_inv = []
-    if invariant_enabled == 2:
-        print("Computing Mode Invariant IGNORED!")
-    else:
+    if invariant_enabled != 2:
+        # print("Computing Mode Invariant IGNORED!")
+    # else:
         mode_inv = compute_invariant(L_y, P_modes, Y)
-        print("Computing Mode Invariant done!")
+        # print("Computing Mode Invariant done!")
 
     return mode_inv
 

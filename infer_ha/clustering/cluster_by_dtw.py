@@ -46,7 +46,7 @@ def get_desired_clusters(P_modes, A, b1):
     # print("Sort clusters based on Data-size and take the first num_mode clusters")
     length_and_modepts = [(len(P[i]), P[i]) for i in range(0, len(P))]  # create a list of 2-tuple
     # length_and_modepts.sort(reverse=True)  # this data is sorted from highest number of points in the cluster to lowest
-    print("DTW: Total clusters = ", len(length_and_modepts))
+    # print("DTW: Total clusters = ", len(length_and_modepts))
 
     #  ***************************************************************
     num_mode = len(length_and_modepts) # Made this change after Paper submission (in the paper engineTiming which was 42
@@ -234,8 +234,8 @@ def cluster_by_dtw(segmented_traj, A, b1, Y, t_list, L_y, correl_threshold, dist
         performance_prune_count = 0  # reset for next cluster
 
     # print("len(P) = ", len(P))
-    print("CLUSTERING: Distance[min,max] = [", min_distance," , ", max_distance,"]")
-    print("CLUSTERING: Correlation[min,max] = [", min_correl, " , ", max_correl, "]")
+    # print("CLUSTERING: Distance[min,max] = [", min_distance," , ", max_distance,"]")
+    # print("CLUSTERING: Correlation[min,max] = [", min_correl, " , ", max_correl, "]")
 
     # P, G = get_desired_clusters(P, A, b1)
     G = get_desired_clusters(P, A, b1)

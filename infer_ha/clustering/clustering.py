@@ -68,9 +68,9 @@ def select_clustering(segmented_traj, A, b1, clfs, Y, t_list, L_y, learning_para
         print("Total Clusters after DBSCAN algorithm = ", len(P_modes))
 
     if method == "dtw":
-        print("Running clustering using  DTW algorithm!!")
+        # print("Running clustering using  DTW algorithm!!")
         P_modes, G = cluster_by_dtw(segmented_traj, A, b1, Y, t_list, L_y, correl_threshold,
                               distance_threshold, size_of_input_variables, stepM, maximum_ode_prune_factor) # t_list only used for debugging using plot
-        print("Total Clusters after DTW algorithm = ", len(P_modes))
+        # print("Total Clusters after DTW algorithm = ", len(P_modes))
 
     return P_modes, G

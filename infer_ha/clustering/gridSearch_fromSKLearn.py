@@ -27,7 +27,7 @@ def gridSearchStart(x, y, param_grid):
     # print(grid.best_estimator_)
     grid_predictions = grid.predict(x)
     # # print classification report
-    print(classification_report(y, grid_predictions))
+    # print(classification_report(y, grid_predictions))
 
     return grid.best_params_['C'], grid.best_params_['gamma'], grid.best_params_['coef0']
 

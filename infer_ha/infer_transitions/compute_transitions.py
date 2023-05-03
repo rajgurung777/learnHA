@@ -37,7 +37,7 @@ def compute_transitions(P_modes, position, segmentedTrajectories, L_y, boundary_
     """
     # print("Computing Connecting points for Transitions ...")
     data_points = create_connecting_points(P_modes, position, segmentedTrajectories)
-    print("Computing Connecting points done!")
+    # print("Computing Connecting points done!")
     # print("len(data_points) =",len(data_points))
     # print("data_points=", data_points)
 
@@ -52,7 +52,7 @@ def compute_transitions(P_modes, position, segmentedTrajectories, L_y, boundary_
     # E.g. in the case of bouncing ball all segments are clustered into One.
     if (number_of_segments_after_cluster == 1) and (number_of_segments_before_cluster >= 1):
         tot_input_trajectories = len(position)
-        print("Total initial simulation=", tot_input_trajectories)
+        # print("Total initial simulation=", tot_input_trajectories)
         if tot_input_trajectories == number_of_segments_before_cluster:
             return transitions  # transitions here is empty for a single mode system without transition.
 

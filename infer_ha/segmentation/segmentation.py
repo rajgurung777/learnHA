@@ -46,7 +46,8 @@ def two_fold_segmentation(A, b1, b2, ytuple, Y, size_of_input_variables, method,
             (1) first, a list of two values for recording start and end points for learning ODE
             (2) second, a list of two values for recording start and end points for learning guard and assignment using
             the exact point of a jump
-            (3) third, a list of values representing the position of points of the trajectories.
+            (3) third, a list of values representing the position of points of the trajectories. Where p_1 and p_n
+            are start_exact and end_exact points.
         clfs: is a list. Each item of the list clfs is a list that holds the coefficients (obtained using linear regression)
            of the ODE of each segment of the segmented trajectories.
         drop: list of points/positions that are dropped during segmentation process.
@@ -145,8 +146,8 @@ def two_fold_segmentation(A, b1, b2, ytuple, Y, size_of_input_variables, method,
                     #
 
                 # print("good_high=", good_high, "  next_good_low=", next_good_low, "  but near_low=", near_high)
-            else:  # what happens if boundary-point is also the exact point? This block will be executed
-                print("************ This block will be exectued only once. Since we have both the check  diff_val < ep_FwdBwd and diff_val >= ep_FwdBwd ************")
+            # else:  # what happens if boundary-point is also the exact point? This block will be executed
+            #     print("************ This block will be exectued only once. Since we have both the check  diff_val < ep_FwdBwd and diff_val >= ep_FwdBwd ************")
 
             # if (good_high - good_low) >= stepM:   this is not safe
             if (near_high - near_low) >= stepM:    # when segment size is >= M points, where M is the step size of LMM
