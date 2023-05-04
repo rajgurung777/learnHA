@@ -121,7 +121,7 @@ def process_type_annotation_parameters(parameters, system_dim):
     # Note the structure of the data structure "variableType_datastruct" defined above
     for i in range(0, system_dim):  # create and initialize the datastruct. Here we assume variable to hold names "x0","x1", etc.
         variableType_datastruct.append([i, "x" + str(i), "", "", ""])
-    print ("data = ", variableType_datastruct)
+    # print ("data = ", variableType_datastruct)
     # print("v_type:",variable_types, "and pool_val:",pool_values,"end")
     # print("Length of v_type:",len(variable_types), "and Length of pool_val:",len(pool_values),"end")
 
@@ -172,7 +172,7 @@ def process_type_annotation_parameters(parameters, system_dim):
                     variableType_datastruct[index][4] = varValue
 
 
-    print ("Data structure populated = ", variableType_datastruct)
+    # print ("Data structure populated = ", variableType_datastruct)
 
     '''
     See the example output after parsing variable_types ="x0=t4, x1=t3, x2=t2, x3=t1, x4=t2" and pool_values="x2={10,20,30,40} & x4={14.7,12.5}"
