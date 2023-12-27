@@ -190,6 +190,41 @@ def create_simple_modes_positions_for_ODE(P_modes):
 
     return P
 
+def create_simple_modes_positions_for_ODE_with_pruned_segments(P_modes, maximum_ode_prune_factor):
+    """
+     This function transforms/creates a "simple data" structure from P_modes. This simple structure is a list of modes.
+     Each mode in the list holding only the position values of data points as a single concatenated list. Unlike the
+     input argument P_modes is a structure with list of modes and each mode has one or more segments in the mode-list.
+     In addition, in each mode we now only consider total number of segments decided by value maximum_ode_prune_factor.
+
+     :param P_modes: holds a list of modes. Each mode is a list of structures; we call it a segment.
+         Thus, P = [mode-1, mode-2, ... , mode-n] where mode-1 = [ segment-1, ... , segment-n] and segments are
+         of type ([start_ode, end_ode], [start_exact, end_exact], [p1, ..., p_n]).
+     :return:
+         P: holds a list of modes. Each mode is a list of positions.
+         Note here we return all the positions of points that lies inside the boundary (excluding the exact points). The
+         total number of segments in each mode is equal to maximum_ode_prune_factor.
+    """
+
+    P = []
+    for mode in P_modes:
+        data_pos = []
+        performance_prune_count = 0
+        for segs in mode:
+            # make a simple mode
+            start_ode = segs[0][0]
+            end_ode = segs[0][1]
+            inexact_seg = list(range(start_ode, end_ode))  # making the list instead of filtering [p1, ..., p_n]
+            data_pos.extend(inexact_seg)  # merge/extend only the inexact positions of the segment
+            performance_prune_count += 1
+            if performance_prune_count >= maximum_ode_prune_factor:  # Just this line helps in pruning same segments for performance of ODE computaion
+                print("performance_prune_count=", performance_prune_count)
+                break       # break the inner for-loop.
+        P.append(data_pos)
+
+    return P
+
+
 def create_simple_per_segmented_positions(segmented_traj):
     """
     This function transforms/creates a simple list structure from segmented_traj. This simple list consists of positions.

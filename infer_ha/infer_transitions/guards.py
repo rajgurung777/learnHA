@@ -61,7 +61,7 @@ def getGuard_inequality(srcData, destData, L_y, boundary_order, Y):
     # print(x)
     # print('label y is ', y)
     # pdb.set_trace()
-    scale_param = csr_find_scale_param(x, lower=-1, upper=1)
+    scale_param = csr_find_scale_param(x, lower=0, upper=1)     # lower=-1 and upper =1
     x = csr_scale(x, scale_param)
     # print("param", scale_param)
     # # ******* scaling data ************
@@ -149,7 +149,7 @@ def getGuard_inequality(srcData, destData, L_y, boundary_order, Y):
 
     # print("guard_coeff is ", guard_coeff)
     p_label, p_acc, p_val = svm_predict(y, x, m, '-q')
-    # print('Accuracy is ', p_acc[0])
+    print('Guard Accuracy is ', p_acc[0])
 
     guard_coeff = inverse_scale(guard_coeff, scale_param, L_y, boundary_order)
 

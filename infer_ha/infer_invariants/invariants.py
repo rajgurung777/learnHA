@@ -26,13 +26,17 @@ def compute_mode_invariant(L_y, P_modes, Y, invariant_enabled):
 
     """
 
+    # Todo: think better option.
     # 0 and 1: enabled 2: disabled
     mode_inv = []
-    if invariant_enabled != 2:
-        # print("Computing Mode Invariant IGNORED!")
-    # else:
+    if invariant_enabled == 2:
+        print("Computing Mode Invariant IGNORED!")
+    else:
         mode_inv = compute_invariant(L_y, P_modes, Y)
-        # print("Computing Mode Invariant done!")
+        print("Computing Mode Invariant done!")
+
+    # mode_inv = compute_invariant(L_y, P_modes, Y)  # Always compute mode Invariant irrespective of user's choice for BBC
+                                                # since it is now needed for automata composition
 
     return mode_inv
 

@@ -48,7 +48,7 @@ def read_commandline_arguments():
                         type=str, default='', required=False)
     parser.add_argument('--ode-speedup', help='Maximum number of segments to include for ODE computation. Set to 10 by default',
                         type=int, default=10, required=False)
-    parser.add_argument('--is-invariant', help='Options are: 0/1/2. Values 0 (default) and 1 ignores invariant and 2 enables computation',
+    parser.add_argument('--is-invariant', help='Options are: 0/1/2. Values 0 (default) and 1 computes invariant and 2 disable computation',
                         type=int, choices=[0, 1, 2], default=0, required=False)
     parser.add_argument('--stepsize', help='Fixed sampling time step-size of the input trajectories. Set to 0.01 by default',
                         type=float, default=0.01, required=False)

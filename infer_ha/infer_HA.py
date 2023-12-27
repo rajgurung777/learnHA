@@ -6,7 +6,7 @@ This is the main module for inferring an HA model.
 import sys  # This is used for command line arguments
 
 from infer_ha.helpers.plotDebug import plot_data_values, output_derivatives, plot_segmentation_new, \
-    plot_after_clustering, print_segmented_trajectories, analyse_output
+    plot_after_clustering, print_segmented_trajectories, analyse_output, plot_guard_points
 # from infer_ha.segmentation.segmentation import two_fold_segmentation_new, segmented_trajectories
 from infer_ha.segmentation.segmentation import two_fold_segmentation, segmented_trajectories
 
@@ -73,7 +73,7 @@ def infer_model(list_of_trajectories, learning_parameters):
     # print("stepM =", stepM)
     mode_inv = []
     transitions = []
-
+    print("stepsize =", stepsize)
     t_list, y_list, position = preprocess_trajectories(list_of_trajectories)
     # print("position = ", position)
     # Apply Linear Multistep Method
@@ -92,11 +92,10 @@ def infer_model(list_of_trajectories, learning_parameters):
     # res, drop, clfs, res_modified = segment_and_fit_Modified_two(A, b1, b2, ytuple,ep)
     # res, drop, clfs, res_modified = two_fold_segmentation_new(A, b1, b2, ytuple, size_of_input_variables, methods, ep)
     segmented_traj, clfs, drop = two_fold_segmentation(A, b1, b2, ytuple, Y, size_of_input_variables, methods, stepM, ep, ep_backward)
-    # print("Number of segments =", len(segmented_traj))
+    print("Number of segments =", len(segmented_traj))
     L_y = len(y_list[0][0])  # Number of dimensions
 
-    # analyse_variable_index = 2  # zero-based indexing. 0 for refrigeration-cycle. and 2 for engine-timing-system
-
+    # analyse_variable_index = 2  # zero-based indexing. 0 for refrigeration-cycle. and 2 for engine-timing-system. 3 for AFC
     # analyse_output(segmented_traj, b1, b2, Y, t_list, L_y, size_of_input_variables, stepM, analyse_variable_index)
 
     # ********* Plotting/Visualizing various points for debugging *************************
@@ -105,7 +104,7 @@ def infer_model(list_of_trajectories, learning_parameters):
     # print("position = ", position)
 
     # print("Y = ", Y)
-    # print("len of drop = ", len(drop))
+    print("len of drop = ", len(drop))
     # print("segmented_traj = ", segmented_traj)
     # print("clfs size = ", len(clfs))
 
@@ -118,9 +117,10 @@ def infer_model(list_of_trajectories, learning_parameters):
     # plot_data_values(segmentedTrajectories, Y, L_y)
     # print()
     # ********* Plotting/Visualizing various points for debugging *************************
-    # plotdebug.plot_guard_points(segmentedTrajectories, L_y, t_list, Y, stepM) # pre-end and end points of each segment
+    # plot_guard_points(segmentedTrajectories, L_y, t_list, Y, stepM) # pre-end and end points of each segment
     # plotdebug.plot_reset_points(segmentedTrajectories_modified, L_y, t_list, Y, stepM) # plotting Reset or Start points
     # plotdebug.plot_segmentation(res, L_y, t_list, Y, stepM) # Trying to verify the segmentation for each segmented points
+
     # plot_segmentation_new(segmented_traj, L_y, t_list, Y, stepM) # Trying to verify the segmentation for each segmented points
 
     number_of_segments_before_cluster = len(segmented_traj)

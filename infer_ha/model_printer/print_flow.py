@@ -15,8 +15,8 @@ def print_flow_dynamics(f_out, G, modeID, Exp):
         odes = "x" + str(dim) + "' = "
         for trm in range(0, G[0].shape[1]):  # for each term of the polynomial
             coef = G[modeID][dim][trm]
-            # odes += str(coef) + " * " + Exp[trm].strip()
-            odes += "{0:.7f}".format(coef) + " * " + Exp[trm].strip()  # Format upto 4 decimal places
+            odes += str(coef) + " * " + Exp[trm].strip()    # without truncating the decimal places
+            # odes += "{0:.7f}".format(coef) + " * " + Exp[trm].strip()  # Format upto 4 decimal places
 
             if (trm != (G[0].shape[1] - 1)):
                 odes += " + "

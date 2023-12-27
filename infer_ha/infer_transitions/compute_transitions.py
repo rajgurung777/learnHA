@@ -71,8 +71,13 @@ def compute_transitions(P_modes, position, segmentedTrajectories, L_y, boundary_
         srcData = []
         destData = []
         for connect_pt in list_connection_pt:
+            # in this implementation we use pre_end_pt_position and end_pt_position for guard
             srcData.append(connect_pt[0])  # index [0] is the pre_end_pt_position
             destData.append(connect_pt[1])  # index [1] is the end_pt_position
+
+            # # in this implementation we use end_pt_position and start_pt_position for guard
+            # srcData.append(connect_pt[1])  # index [1] is the end_pt_position
+            # destData.append(connect_pt[2])  # index [2] is the start_pt_position
 
         guard_coeff = getGuard_inequality(srcData, destData, L_y, boundary_order, Y)
 

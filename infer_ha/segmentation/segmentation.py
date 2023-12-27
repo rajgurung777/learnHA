@@ -112,14 +112,16 @@ def two_fold_segmentation(A, b1, b2, ytuple, Y, size_of_input_variables, method,
                     relDiff_forward = rel_diff(b2[high, size_of_input_variables:], b2[(high + 1),
                                 size_of_input_variables:])  # rel diff: current and next forward-derivatives
 
-                # print("high=", high, "  relDiff_Data =", relDiff_data_value, "  relDiff_Bwd=", relDiff_backward, "  relDiff_Fwd =", relDiff_forward)
-                # print("pos =", high, "  diff_val =", diff_val,  "  relDiff_Bwd=", relDiff_backward, "  relDiff_Fwd =", relDiff_forward)
                 if diff_val >= ep_FwdBwd:  # high difference.    This will detect and store all boundary points
                     # position_diffValue.append([high, relDiff_backward, relDiff_forward, relDiff_data_value]) # recording position and diff-value
                     position_diffValue.append([high, relDiff_backward, relDiff_forward])  # recording position and diff-value
                     high += 1
                 else:  # low difference so same segment
                     break
+                # print("high=", high, "  relDiff_Data =", relDiff_data_value, "  relDiff_Bwd=", relDiff_backward, "  relDiff_Fwd =", relDiff_forward)
+                # print("pos =", high, "  diff_val =", diff_val,  "  relDiff_Bwd=", relDiff_backward, "  relDiff_Fwd =", relDiff_forward)
+
+
 
             if len(position_diffValue) != 0:
                 # find last point and then also check if the next point is fit for the start-pt for next segment, otherwise find next correct point
@@ -201,26 +203,20 @@ def segmented_trajectories(clfs, segmented_traj, position, method, filter_last_s
 
     Note: Should not delete the segment if a trajectories has only one segment per trajectory.
 
-
-    :param
-        clfs: is a list. Each item of the list clfs is a list that holds the coefficients (obtained using linear
+    :param clfs: is a list. Each item of the list clfs is a list that holds the coefficients (obtained using linear
         regression) of the ODE of each segment of the segmented trajectories.
-    :param
-        segmented_traj: is a list of a custom data structure consisting of segmented trajectories (positions). Each item
+    :param segmented_traj: is a list of a custom data structure consisting of segmented trajectories (positions). Each item
         of the list contains tuple of the form ([start_ode, end_ode], [start_exact, end_exact], [p_1, ... , p_n]).
         The Tuple has three items:
             (1) first, a list of two values for recording start and end points for learning ODE
             (2) second, a list of two values for recording start and end points for learning guard and assignment using
             the exact point of a jump
             (3) third, a list of values representing the position of points of the trajectories.
-    :param
-        position: is a list of position data structure. Each position is a pair (start, end) position of a trajectory.
+    :param position: is a list of position data structure. Each position is a pair (start, end) position of a trajectory.
         For instance, the first item of the list is [0, 100] means that the trajectory has 101 points. The second item
         as [101, 300], meaning the second trajectory has 200 points. Note that all the trajectories are concatenated.
-    :param
-        method: clustering method selected by the user (options dtw, dbscan, etc.)
-    :param
-        filter_last_segment: is a boolean value. 1 to enable the filter condition for removing the last segment and
+    :param method: clustering method selected by the user (options dtw, dbscan, etc.)
+    :param filter_last_segment: is a boolean value. 1 to enable the filter condition for removing the last segment and
         0 for not removing the last segment.
     :return: The following data structures
         segmentedTrajectories: the required position data structures. Is a list, each item is of the
@@ -256,8 +252,8 @@ def segmented_trajectories(clfs, segmented_traj, position, method, filter_last_s
         s = seg_traj_element[2] # third element of the tuple segmented_traj
         # print("s=",s)
         start_segment_pos = s[0]  # start position of the segment
-        end_segment_pos = s[len(s) - 1]  # end position of the segment
         pre_end_segment_pos = s[len(s) - 2]  # pre-end position of the segment (2nd last position)
+        end_segment_pos = s[len(s) - 1]  # end position of the segment
         # print("start_segment_pos=",start_segment_pos,"   pre_end_segment_pos =",pre_end_segment_pos , "   end_segment_pos=", end_segment_pos)
         traj_segs = []
         traj_segs.append(start_segment_pos)

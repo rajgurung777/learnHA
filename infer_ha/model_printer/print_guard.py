@@ -19,7 +19,7 @@ def print_guard(f_out, coeffs, gExp):
         coef_val = coeffs[i]
         if (coef1 != 0) and (coef1 > 1  or coef1 < 1):  # divide only when first coefficient is >1 to normalize and not spoil/raise values
             coef_val = coef_val / coef1  # Dividing all coefficient by the 1st coefficient, since right hand side of the equation is 0
-            # coef_val = coef_val / 100  # guard coefficient further scaled down by 100 for avoiding large numerical calculation issues
+            # coef_val = coef_val
 
         guard += str(coef_val) + " * " + gExp[i].strip()
         # guard += "{0:.4f}".format(coef_val) + " * " + gExp[i].strip()
