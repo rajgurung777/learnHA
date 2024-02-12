@@ -64,6 +64,8 @@ def select_clustering(segmented_traj, A, b1, clfs, Y, t_list, L_y, learning_para
 
     if method == "dbscan":
         print("Running DBSCAN clustering algorithm!!")
+        print("We do not support this clustering algorithm anymore. We have now modifed the number of data structure, it requires some modification to support it again!!")
+        exit(1)
         P_modes, G = dbscan_cluster(clfs, segmented_traj, A, b1, num_mode, dbscan_eps_dist, dbscan_min_samples, size_of_input_variables)
         print("Total Clusters after DBSCAN algorithm = ", len(P_modes))
 

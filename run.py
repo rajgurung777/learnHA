@@ -12,6 +12,12 @@ methods = ['dbscan', 'piecelinear', 'dtw']
 
 
 def runLearnHA():  # Calling the implementation from project BBC4CPS
+    '''
+    Hints:
+        To analysis the segmentation output: in the file "learnHA/infer_ha/infer_HA.py" uncomment the line 24 having "plot_segmentation_new(segmented_traj, L_y, t_list, Y, stepM)"
+        To analysis the clustering output: in the file "learnHA/infer_ha/infer_HA.py" uncomment the line 136 having "plot_after_clustering(t_list, L_y, P_modes, Y, stepM)"
+    @return:
+    '''
     # input_filename, output_filename, list_of_trajectories, learning_parameters = read_command_line(sys.argv)
     parameters = read_commandline_arguments()   # reads the command line values also can use -h to see help on usages
 
